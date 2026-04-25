@@ -114,4 +114,4 @@ Vitest は `src/tests/` および `tests/unit/` を対象とし、Playwright の
 
 ## ライセンス
 
-未定。
+[MIT License](./LICENSE) — Copyright (c) 2026 yunbow
