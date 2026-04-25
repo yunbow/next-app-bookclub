@@ -1,0 +1,600 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// ==================== Authentication ====================
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  username      String?   @unique
+  email         String    @unique
+  emailVerified DateTime?
+  password      String?
+  image         String?
+  bio           String?
+  xp            Int       @default(0)  // 読書経験ポイント
+  level         Int       @default(1)  // レベル
+  notificationSettings String? // JSON string for notification preferences
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  accounts      Account[]
+  sessions      Session[]
+  books         UserBook[]
+  reviews       Review[]
+  reviewComments ReviewComment[]
+  reviewReactions ReviewReaction[]
+  events        Event[]
+  eventParticipants EventParticipant[]
+  eventReports  EventReport[]
+  eventReportComments EventReportComment[]
+  following     Follow[]  @relation("Following")
+  followers     Follow[]  @relation("Followers")
+  blocking      Block[]   @relation("Blocking")
+  blockedBy     Block[]   @relation("BlockedBy")
+  notifications Notification[] @relation("NotificationRecipient")
+  triggeredNotifications Notification[] @relation("NotificationActor")
+  challengeParticipants ChallengeParticipant[]
+  readingStreak ReadingStreak?
+  activities Activity[]
+  loginHistories LoginHistory[]
+  bookmarks BookBookmark[]
+  favoriteGenresList UserFavoriteGenre[]
+
+  @@map("users")
+}
+
+model Genre {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  slug      String   @unique
+  createdAt DateTime @default(now())
+
+  users UserFavoriteGenre[]
+
+  @@map("genres")
+}
+
+model UserFavoriteGenre {
+  id        String   @id @default(cuid())
+  userId    String
+  genreId   String
+  createdAt DateTime @default(now())
+
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  genre Genre @relation(fields: [genreId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, genreId])
+  @@index([userId])
+  @@index([genreId])
+  @@map("user_favorite_genres")
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@map("accounts")
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("sessions")
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+  @@map("verification_tokens")
+}
+
+// ==================== Books ====================
+
+model Book {
+  id          String   @id @default(cuid())
+  isbn        String?  @unique
+  jan         String?
+  title       String
+  author      String?
+  publisher   String?
+  publishedYear Int?
+  category    String?
+  description String?
+  coverImage  String?
+  pages       Int?     // Number of pages
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  userBooks   UserBook[]
+  reviews     Review[]
+  eventBooks  EventBook[]
+  bookmarks   BookBookmark[]
+
+  @@map("books")
+}
+
+model BookBookmark {
+  id        String   @id @default(cuid())
+  userId    String
+  bookId    String
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  book Book @relation(fields: [bookId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, bookId])
+  @@index([userId])
+  @@map("book_bookmarks")
+}
+
+// ==================== Reading Management ====================
+
+model UserBook {
+  id          String   @id @default(cuid())
+  userId      String
+  bookId      String
+  status      String   @default("to_read") // to_read, reading, completed, paused
+  startDate   DateTime?
+  endDate     DateTime?
+  readingDays Int      @default(0)
+  currentPage Int      @default(0)  // 現在のページ数
+  rating      Int?     // 1-5
+  memo        String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  book Book @relation(fields: [bookId], references: [id], onDelete: Cascade)
+  sessions ReadingSession[]
+
+  @@unique([userId, bookId])
+  @@index([userId, status])
+  @@map("user_books")
+}
+
+// ==================== Reviews ====================
+
+model Review {
+  id          String   @id @default(cuid())
+  userId      String
+  bookId      String
+  content     String
+  rating      Int?     // 1-5
+  visibility  String   @default("public") // public, private, draft
+  publishAt   DateTime? // Scheduled publish date
+  images      String?  // JSON array of image URLs
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  book     Book     @relation(fields: [bookId], references: [id], onDelete: Cascade)
+  comments ReviewComment[]
+  reactions ReviewReaction[]
+
+  @@index([bookId])
+  @@index([userId])
+  @@index([publishAt])
+  @@map("reviews")
+}
+
+model ReviewComment {
+  id        String   @id @default(cuid())
+  reviewId  String
+  userId    String
+  content   String
+  createdAt DateTime @default(now())
+
+  review Review @relation(fields: [reviewId], references: [id], onDelete: Cascade)
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([reviewId])
+  @@map("review_comments")
+}
+
+model ReviewReaction {
+  id        String   @id @default(cuid())
+  reviewId  String
+  userId    String
+  type      String   // like, clap, sad, surprise
+  createdAt DateTime @default(now())
+
+  review Review @relation(fields: [reviewId], references: [id], onDelete: Cascade)
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([reviewId, userId, type])
+  @@index([reviewId])
+  @@map("review_reactions")
+}
+
+// ==================== Events ====================
+
+model Event {
+  id          String   @id @default(cuid())
+  title       String
+  description String?
+  date        DateTime
+  location    String?  // オンライン/オフライン
+  isOnline    Boolean  @default(false)
+  capacity    Int?
+  theme       String?
+  requiresApproval Boolean @default(false)
+  organizerId String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  organizer    User     @relation(fields: [organizerId], references: [id], onDelete: Cascade)
+  participants EventParticipant[]
+  books        EventBook[]
+  reports      EventReport[]
+
+  @@index([date])
+  @@map("events")
+}
+
+model EventParticipant {
+  id        String   @id @default(cuid())
+  eventId   String
+  userId    String
+  status    String   @default("pending") // pending, approved, rejected
+  createdAt DateTime @default(now())
+
+  event Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([eventId, userId])
+  @@map("event_participants")
+}
+
+model EventBook {
+  id      String @id @default(cuid())
+  eventId String
+  bookId  String
+
+  event Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  book  Book  @relation(fields: [bookId], references: [id], onDelete: Cascade)
+
+  @@unique([eventId, bookId])
+  @@map("event_books")
+}
+
+model EventReport {
+  id        String   @id @default(cuid())
+  eventId   String
+  userId    String
+  content   String
+  visibility String  @default("public") // public, private, draft
+  publishAt DateTime? // Scheduled publish date
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  event Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  comments EventReportComment[]
+
+  @@index([publishAt])
+  @@map("event_reports")
+}
+
+model EventReportComment {
+  id        String   @id @default(cuid())
+  reportId  String
+  userId    String
+  content   String
+  createdAt DateTime @default(now())
+
+  report EventReport @relation(fields: [reportId], references: [id], onDelete: Cascade)
+  user   User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([reportId])
+  @@index([userId])
+  @@map("event_report_comments")
+}
+
+// ==================== Social ====================
+
+model Follow {
+  id          String   @id @default(cuid())
+  followerId  String
+  followingId String
+  createdAt   DateTime @default(now())
+
+  follower  User @relation("Following", fields: [followerId], references: [id], onDelete: Cascade)
+  following User @relation("Followers", fields: [followingId], references: [id], onDelete: Cascade)
+
+  @@unique([followerId, followingId])
+  @@map("follows")
+}
+
+model Block {
+  id        String   @id @default(cuid())
+  blockerId String
+  blockedId String
+  createdAt DateTime @default(now())
+
+  blocker User @relation("Blocking", fields: [blockerId], references: [id], onDelete: Cascade)
+  blocked User @relation("BlockedBy", fields: [blockedId], references: [id], onDelete: Cascade)
+
+  @@unique([blockerId, blockedId])
+  @@map("blocks")
+}
+
+// ==================== Notifications ====================
+
+model Notification {
+  id          String   @id @default(cuid())
+  type        String   // follow, review_comment, review_reaction, event_invite, level_up, badge_earned, challenge_completed
+  read        Boolean  @default(false)
+  recipientId String
+  actorId     String
+  resourceId  String?  // reviewId, eventId, badgeId, challengeId, etc.
+  createdAt   DateTime @default(now())
+
+  recipient User @relation("NotificationRecipient", fields: [recipientId], references: [id], onDelete: Cascade)
+  actor     User @relation("NotificationActor", fields: [actorId], references: [id], onDelete: Cascade)
+
+  @@index([recipientId, read])
+  @@map("notifications")
+}
+
+// ==================== Timeline/Activity ====================
+
+model Activity {
+  id         String   @id @default(cuid())
+  userId     String
+  type       String   // reading_started, reading_completed, review_posted, event_joined
+  resourceId String?  // bookId, reviewId, eventId
+  metadata   String?  // JSON string for additional data
+  createdAt  DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
+  @@index([createdAt])
+  @@map("activities")
+}
+
+// ==================== Groups ====================
+
+model Group {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  creatorId   String
+  isPrivate   Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  members     GroupMember[]
+  goals       GroupGoal[]
+  books       GroupBook[]
+
+  @@map("groups")
+}
+
+model GroupMember {
+  id        String   @id @default(cuid())
+  groupId   String
+  userId    String
+  role      String   @default("member") // admin, member
+  joinedAt  DateTime @default(now())
+
+  group Group @relation(fields: [groupId], references: [id], onDelete: Cascade)
+
+  @@unique([groupId, userId])
+  @@map("group_members")
+}
+
+model GroupGoal {
+  id          String   @id @default(cuid())
+  groupId     String
+  title       String
+  description String?
+  targetDate  DateTime?
+  completed   Boolean  @default(false)
+  createdAt   DateTime @default(now())
+
+  group Group @relation(fields: [groupId], references: [id], onDelete: Cascade)
+
+  @@map("group_goals")
+}
+
+model GroupBook {
+  id        String   @id @default(cuid())
+  groupId   String
+  bookId    String
+  type      String   @default("recommended") // recommended, required
+  addedAt   DateTime @default(now())
+
+  group Group @relation(fields: [groupId], references: [id], onDelete: Cascade)
+
+  @@unique([groupId, bookId])
+  @@map("group_books")
+}
+
+// ==================== Reading Challenges ====================
+
+model Challenge {
+  id          String   @id @default(cuid())
+  type        String   // monthly_books, yearly_books, genre_diversity, reading_streak
+  title       String
+  description String?
+  target      Int      // Target number (e.g., 10 books, 5 genres)
+  startDate   DateTime
+  endDate     DateTime
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+
+  participants ChallengeParticipant[]
+
+  @@index([type, isActive])
+  @@map("challenges")
+}
+
+model ChallengeParticipant {
+  id          String   @id @default(cuid())
+  challengeId String
+  userId      String
+  progress    Int      @default(0)
+  completed   Boolean  @default(false)
+  completedAt DateTime?
+  joinedAt    DateTime @default(now())
+
+  challenge Challenge @relation(fields: [challengeId], references: [id], onDelete: Cascade)
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([challengeId, userId])
+  @@index([userId, completed])
+  @@map("challenge_participants")
+}
+
+// ==================== Badges & Achievements ====================
+
+model Badge {
+  id          String   @id @default(cuid())
+  code        String   @unique // first_review, review_10, genre_master, etc.
+  name        String
+  description String
+  icon        String?  // Icon name or emoji
+  rarity      String   @default("common") // common, rare, epic, legendary
+  category    String   // reading, social, event, streak
+  requirement String?  // JSON string with requirements
+  xpReward    Int      @default(0)
+  createdAt   DateTime @default(now())
+
+  userBadges  UserBadge[]
+
+  @@map("badges")
+}
+
+model UserBadge {
+  id        String   @id @default(cuid())
+  userId    String
+  badgeId   String
+  earnedAt  DateTime @default(now())
+
+  badge Badge @relation(fields: [badgeId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, badgeId])
+  @@index([userId])
+  @@map("user_badges")
+}
+
+// ==================== Reading Streaks ====================
+
+model ReadingStreak {
+  id            String   @id @default(cuid())
+  userId        String   @unique
+  currentStreak Int      @default(0)
+  longestStreak Int      @default(0)
+  lastReadDate  DateTime?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("reading_streaks")
+}
+
+// ==================== Highlights & Quotes ====================
+
+model Highlight {
+  id          String   @id @default(cuid())
+  userId      String
+  bookId      String
+  content     String
+  pageNumber  Int?
+  chapter     String?
+  note        String?
+  color       String?  @default("yellow") // yellow, green, blue, pink
+  isPublic    Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([userId, bookId])
+  @@index([isPublic])
+  @@map("highlights")
+}
+
+// ==================== Reading Sessions ====================
+
+model ReadingSession {
+  id          String   @id @default(cuid())
+  userBookId  String
+  userId      String
+  startTime   DateTime
+  endTime     DateTime?
+  duration    Int      @default(0) // in seconds
+  pagesRead   Int      @default(0)
+  createdAt   DateTime @default(now())
+
+  userBook UserBook @relation(fields: [userBookId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([userBookId])
+  @@index([startTime])
+  @@map("reading_sessions")
+}
+
+// ==================== Reading Goals ====================
+
+model ReadingGoal {
+  id        String   @id @default(cuid())
+  userId    String
+  type      String   // yearly_books, monthly_books, genre_books, pages
+  target    Int
+  current   Int      @default(0)
+  year      Int
+  month     Int?
+  genre     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+  @@index([year, month])
+  @@map("reading_goals")
+}
+
+
+
+// ==================== Login History ====================
+
+model LoginHistory {
+  id        String   @id @default(cuid())
+  userId    String
+  ipAddress String?
+  userAgent String?
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
+  @@map("login_histories")
+}

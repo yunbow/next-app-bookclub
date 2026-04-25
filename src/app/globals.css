@@ -1,0 +1,87 @@
+@import "tailwindcss";
+@config "../../tailwind.config.ts";
+
+:root {
+  --background: 40 20% 96%;
+  --foreground: 25 10% 30%;
+  --card: 0 0% 100%;
+  --card-foreground: 25 10% 30%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 25 10% 30%;
+  --primary: 40 60% 55%;
+  --primary-foreground: 0 0% 98%;
+  --secondary: 40 30% 92%;
+  --secondary-foreground: 25 50% 35%;
+  --muted: 40 20% 94%;
+  --muted-foreground: 25 10% 55%;
+  --accent: 40 40% 88%;
+  --accent-foreground: 25 50% 35%;
+  --destructive: 0 84% 60%;
+  --destructive-foreground: 0 0% 98%;
+  --border: 40 20% 88%;
+  --input: 40 20% 88%;
+  --ring: 40 60% 55%;
+  --radius: 0.5rem;
+  --font-sans: var(--font-geist-sans), var(--font-noto-sans-jp), system-ui, -apple-system, BlinkMacSystemFont, "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Yu Gothic", Meiryo, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, Menlo, Monaco, Consolas, "Courier New", monospace;
+}
+
+.dark {
+  --background: 25 20% 20%;
+  --foreground: 40 10% 95%;
+  --card: 25 20% 25%;
+  --card-foreground: 40 10% 95%;
+  --popover: 25 20% 25%;
+  --popover-foreground: 40 10% 95%;
+  --primary: 40 60% 65%;
+  --primary-foreground: 25 20% 20%;
+  --secondary: 25 20% 30%;
+  --secondary-foreground: 40 50% 90%;
+  --muted: 25 20% 35%;
+  --muted-foreground: 40 10% 70%;
+  --accent: 40 40% 40%;
+  --accent-foreground: 40 50% 90%;
+  --destructive: 0 84% 65%;
+  --destructive-foreground: 25 20% 20%;
+  --border: 25 20% 35%;
+  --input: 25 20% 35%;
+  --ring: 40 60% 65%;
+}
+
+* {
+  border-color: hsl(var(--border));
+}
+
+body {
+  background-color: hsl(var(--background));
+  color: hsl(var(--foreground));
+  font-family: var(--font-sans);
+}
+
+/* Dialog overlay - ensure it's dark enough */
+[data-slot="dialog-overlay"] {
+  background-color: rgba(0, 0, 0, 0.9) !important;
+}
+
+/* Dialog content - ensure it's visible */
+[data-slot="dialog-content"] {
+  background-color: hsl(var(--card)) !important;
+}
+
+/* Respect the user OS "reduce motion" preference.
+ * Wildcard reset is the widely-accepted pragma (MDN / a11y-project):
+ *   - 0.01ms (not 0ms) keeps animation/transition end-events firing so JS
+ *     listeners keyed on transitionend still work.
+ *   - Covers Tailwind animate- and transition- utilities and custom @keyframes.
+ * Opt back into motion per-element with motion-safe: Tailwind variant or an
+ * explicit media query override when motion conveys meaning. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

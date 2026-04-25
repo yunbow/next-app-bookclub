@@ -55,6 +55,6 @@ prisma/*.db-journal
 .codeium/
 .roo/
 .cline/
-CLAUDE.local.md
+CLAUDE.md
 AGENTS.md
 GEMINI.md

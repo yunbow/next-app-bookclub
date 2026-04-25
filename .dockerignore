@@ -1,0 +1,70 @@
+# Canonical .dockerignore for Next.js + Prisma apps
+# Keep this in sync with the Dockerfile template.
+
+# dependencies — re-installed in Docker build stages
+node_modules
+npm-debug.log
+yarn-debug.log
+yarn-error.log
+.pnpm-debug.log
+.pnp
+.pnp.*
+.yarn
+
+# Next.js build output — regenerated in the builder stage
+.next
+out
+build
+
+# Env files — NEVER include in image. DATABASE_URL / secrets must come via
+# container runtime env (docker run -e, k8s secret, etc.), not baked in.
+.env
+.env.*
+!.env.example
+
+# Testing / coverage
+coverage
+playwright-report
+test-results
+.nyc_output
+*.lcov
+
+# Local dev databases — must not leak into production image
+prisma/dev.db
+prisma/dev.db-journal
+prisma/*.db
+prisma/*.db-journal
+
+# VCS / IDE
+.git
+.gitignore
+.gitattributes
+.vscode
+.idea
+.fleet
+
+# OS cruft
+.DS_Store
+Thumbs.db
+
+# Local CI caches
+.vercel
+.turbo
+.cache
+
+# Documentation — not needed at runtime
+*.md
+README*
+CHANGELOG*
+CONTRIBUTING*
+LICENSE*
+docs
+IMPLEMENTATION_STATUS.md
+
+# Existing Dockerfile itself (prevent recursion when building from parent context)
+Dockerfile
+.dockerignore
+
+# TypeScript build info
+*.tsbuildinfo
+next-env.d.ts
