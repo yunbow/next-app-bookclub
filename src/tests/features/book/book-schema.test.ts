@@ -54,7 +54,7 @@ describe("Book Schema", () => {
     it("should validate valid status", () => {
       const validData = {
         status: "reading" as const,
-        startDate: new Date(),
+        startDate: new Date().toISOString(),
       };
 
       const result = updateUserBookSchema.safeParse(validData);

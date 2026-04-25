@@ -11,9 +11,9 @@ describe("Review Schema", () => {
     it("should validate valid review data", () => {
       const validData = {
         bookId: "book-123",
-        content: "Great book!",
+        content: "Great book!!",
         rating: 5,
-        isPublic: true,
+        visibility: "public" as const,
       };
 
       const result = createReviewSchema.safeParse(validData);

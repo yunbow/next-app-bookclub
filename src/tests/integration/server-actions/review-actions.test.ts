@@ -33,6 +33,9 @@ vi.mock("@/lib/prisma", () => ({
       create: vi.fn(),
       delete: vi.fn(),
     },
+    notification: {
+      create: vi.fn(),
+    },
   },
 }));
 
@@ -47,7 +50,7 @@ describe("Review Actions", () => {
         id: "review-123",
         bookId: "book-123",
         userId: "test-user-id",
-        content: "Great book!",
+        content: "Great book!!",
         rating: 5,
       };
 
@@ -56,9 +59,9 @@ describe("Review Actions", () => {
 
       const result = await createReviewAction({
         bookId: "book-123",
-        content: "Great book!",
+        content: "Great book!!",
         rating: 5,
-        isPublic: true,
+        visibility: "public",
       });
 
       expect(result.success).toBe(true);
@@ -70,9 +73,9 @@ describe("Review Actions", () => {
     it("should return error for invalid rating", async () => {
       const result = await createReviewAction({
         bookId: "book-123",
-        content: "Great book!",
+        content: "Great book!!",
         rating: 6, // Invalid: > 5
-        isPublic: true,
+        visibility: "public",
       });
 
       expect(result.success).toBe(false);
@@ -87,6 +90,7 @@ describe("Review Actions", () => {
       const { prisma } = await import("@/lib/prisma");
       vi.mocked(prisma.reviewReaction.findFirst).mockResolvedValue(null);
       vi.mocked(prisma.reviewReaction.create).mockResolvedValue({} as any);
+      vi.mocked(prisma.review.findUnique).mockResolvedValue(null);
 
       const result = await toggleReviewReactionAction({
         reviewId: "review-123",
@@ -95,7 +99,7 @@ describe("Review Actions", () => {
 
       expect(result.success).toBe(true);
       if (result.success) {
-        expect(result.data).toEqual({ added: true });
+        expect(result.data).toEqual({ isReacted: true });
       }
     });
 
@@ -113,7 +117,7 @@ describe("Review Actions", () => {
 
       expect(result.success).toBe(true);
       if (result.success) {
-        expect(result.data).toEqual({ added: false });
+        expect(result.data).toEqual({ isReacted: false });
       }
     });
   });

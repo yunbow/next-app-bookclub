@@ -1,80 +1,117 @@
-# BookClub - 読書管理アプリ
+# BookClub
 
-本の管理、読書記録、レビュー共有、読書会まで。あなたの読書ライフをサポートするアプリケーションです。
+読書記録・レビュー・読書イベント・グループでの交流を 1 つにまとめた Web アプリケーションです。Next.js (App Router) + Prisma + SQLite を中心に、認証・ゲーミフィケーション・通知・統計など読書まわりの機能を備えています。
 
 ## 主な機能
 
-- 📚 本の管理（ISBN検索、Google Books API連携）
-- 📖 読書記録（ステータス管理、読書日数記録）
-- ✍️ レビュー機能（Markdown対応、コメント、リアクション）
-- 📅 読書会管理（イベント作成、参加管理）
-- 📊 読書統計（月間・年間の読書量グラフ）
-- 👥 ソーシャル機能（フォロー、タイムライン）
-- 🔔 通知機能
-- 🌙 ダークモード対応
+- 📚 **書籍管理** — 読みたい / 読書中 / 読了 のステータス管理、ISBN 登録、Google Books からの検索
+- ✍️ **レビュー & リアクション** — 公開／非公開の切替、コメント、いいね等のリアクション
+- 📅 **読書イベント** — オンライン / オフラインのイベント主催、定員管理、参加申請、レポート
+- 🎯 **読書目標 & 進捗** — 年次／月次／ジャンル別目標、ページ単位の進捗、読書セッション
+- ✨ **ハイライト** — 本からの引用を保存・共有
+- 👥 **グループ** — 読書仲間とのグループ運営
+- 🏆 **ゲーミフィケーション** — XP / レベル / バッジ / 連続記録（ストリーク）
+- 🔔 **通知 & タイムライン** — 参加・コメント等の活動通知
+- 🔐 **認証** — Email/Password、Google、GitHub（NextAuth.js）
 
 ## 技術スタック
 
-- **フレームワーク**: Next.js 16 (App Router)
-- **言語**: TypeScript
-- **認証**: NextAuth.js v5
-- **データベース**: Prisma + SQLite (開発環境)
-- **スタイリング**: Tailwind CSS
-- **UIコンポーネント**: Radix UI
-- **フォーム**: React Hook Form + Zod
-- **状態管理**: TanStack Query
+| カテゴリ | 採用技術 |
+| --- | --- |
+| フレームワーク | Next.js 16 (App Router) / React 19 |
+| 言語 | TypeScript 5 |
+| スタイリング | Tailwind CSS 4 / Radix UI / shadcn/ui 形式コンポーネント |
+| データベース | SQLite + Prisma 6 |
+| 認証 | NextAuth.js v5 (beta) |
+| バリデーション | Zod 4 |
+| フォーム | React Hook Form |
+| データ取得 | TanStack Query |
+| ユニット / 統合テスト | Vitest + Testing Library |
+| E2E テスト | Playwright |
+| ロガー | Pino |
 
-## セットアップ
+## クイックスタート
 
-### 1. 依存関係のインストール
-
-\`\`\`bash
+```bash
+# 1. 依存をインストール
 npm install
-\`\`\`
 
-### 2. 環境変数の設定
-
-\`.env.example\`を\`.env\`にコピーして、必要な値を設定してください。
-
-\`\`\`bash
+# 2. 環境変数を準備
 cp .env.example .env
-\`\`\`
 
-### 3. データベースのセットアップ
+# 3. DB を初期化
+npm run db:migrate:dev
 
-\`\`\`bash
-npx prisma generate
-npx prisma db push
-\`\`\`
-
-### 4. 開発サーバーの起動
-
-\`\`\`bash
+# 4. 開発サーバー起動
 npm run dev
-\`\`\`
+```
 
-ブラウザで [http://localhost:3000](http://localhost:3000) を開いてください。
+ブラウザで http://localhost:3000 を開きます。
 
-## スクリプト
+詳しいセットアップ手順、トラブルシューティングは [`docs/usages/local-setup.md`](./docs/usages/local-setup.md) を参照してください。
 
-- \`npm run dev\` - 開発サーバーを起動
-- \`npm run build\` - 本番用ビルド
-- \`npm run start\` - 本番サーバーを起動
-- \`npm run lint\` - ESLintでコードをチェック
-- \`npm run format\` - Prettierでコードをフォーマット
-- \`npm run test\` - テストを実行
+## npm スクリプト
 
-## プロジェクト構造
+| コマンド | 内容 |
+| --- | --- |
+| `npm run dev` | 開発サーバー起動 |
+| `npm run build` | プロダクションビルド |
+| `npm start` | ビルド済みアプリ起動 |
+| `npm run lint` | ESLint 実行 |
+| `npm run format` / `format:check` | Prettier 整形 / チェック |
+| `npm run test` | Vitest（watch） |
+| `npm run test:run` | Vitest を 1 回実行 |
+| `npm run test:coverage` | カバレッジ付きでテスト |
+| `npm run test:e2e` | Playwright で E2E テスト |
+| `npm run db:migrate:dev` | 開発用マイグレーション適用 |
+| `npm run db:migrate:deploy` | 本番マイグレーション適用 |
+| `npm run db:migrate:status` | マイグレーション状態確認 |
+| `npm run analyze` | バンドル解析 |
 
-\`\`\`
-src/
-├── app/              # Next.js App Router
-├── components/       # 共通コンポーネント
-├── features/         # 機能別コンポーネント
-├── lib/              # ユーティリティ、設定
-└── types/            # 型定義
-\`\`\`
+## ディレクトリ構成
+
+```
+.
+├── prisma/              # Prisma スキーマ・マイグレーション・dev.db
+├── public/              # 静的アセット
+├── scripts/             # 補助スクリプト
+├── src/
+│   ├── app/             # Next.js App Router
+│   │   ├── (auth)/      # 認証画面
+│   │   ├── (protected)/ # ログイン必須画面
+│   │   ├── (public)/    # 公開画面
+│   │   └── api/         # Route Handlers
+│   ├── features/        # 機能別モジュール（schema / server / components）
+│   ├── lib/             # 共通ライブラリ（auth, prisma, actions など）
+│   └── tests/           # Vitest 用テスト（unit / integration）
+├── tests/
+│   └── e2e/             # Playwright E2E テスト
+├── docs/                # プロジェクトドキュメント
+├── Dockerfile
+├── playwright.config.ts
+├── vitest.config.ts
+└── package.json
+```
+
+## テスト
+
+```bash
+# Vitest（unit / integration）
+npm run test:run
+
+# Playwright（E2E）
+npx playwright install   # 初回のみ
+npm run test:e2e
+```
+
+Vitest は `src/tests/` および `tests/unit/` を対象とし、Playwright の E2E テスト（`tests/e2e/`）は除外しています。
+
+## ドキュメント
+
+- [ローカル環境構築手順](./docs/usages/local-setup.md)
+- [完了報告](./docs/completion-report.md)
+- [AI DEV OS ガイドライン](./docs/ai-dev-os/)
 
 ## ライセンス
 
-MIT
+未定。

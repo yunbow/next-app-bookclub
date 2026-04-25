@@ -18,8 +18,8 @@ vi.mock("@/lib/prisma", () => ({
       findUnique: vi.fn(),
     },
     userBook: {
-      findFirst: vi.fn(),
-      update: vi.fn(),
+      findUnique: vi.fn(),
+      upsert: vi.fn(),
       delete: vi.fn(),
     },
   },
@@ -39,11 +39,13 @@ describe("Book Actions", () => {
       };
 
       const { prisma } = await import("@/lib/prisma");
+      vi.mocked(prisma.book.findUnique).mockResolvedValue(null);
       vi.mocked(prisma.book.create).mockResolvedValue(mockBook as any);
 
       const result = await createBookAction({
         title: "Test Book",
         author: "Test Author",
+        isbn: "9784123456789",
       });
 
       expect(result.success).toBe(true);
@@ -55,6 +57,7 @@ describe("Book Actions", () => {
     it("should return error for invalid data", async () => {
       const result = await createBookAction({
         title: "", // Invalid: empty title
+        isbn: "9784123456789",
       });
 
       expect(result.success).toBe(false);
@@ -69,6 +72,7 @@ describe("Book Actions", () => {
 
       const result = await createBookAction({
         title: "Test Book",
+        isbn: "9784123456789",
       });
 
       expect(result.success).toBe(false);
@@ -81,13 +85,7 @@ describe("Book Actions", () => {
   describe("updateUserBookAction", () => {
     it("should update user book successfully", async () => {
       const { prisma } = await import("@/lib/prisma");
-      vi.mocked(prisma.userBook.findFirst).mockResolvedValue({
-        id: "userbook-123",
-        userId: "test-user-id",
-        bookId: "book-123",
-      } as any);
-
-      vi.mocked(prisma.userBook.update).mockResolvedValue({} as any);
+      vi.mocked(prisma.userBook.upsert).mockResolvedValue({} as any);
 
       const result = await updateUserBookAction("book-123", {
         status: "reading",
@@ -95,30 +93,12 @@ describe("Book Actions", () => {
 
       expect(result.success).toBe(true);
     });
-
-    it("should return error for unauthorized access", async () => {
-      const { prisma } = await import("@/lib/prisma");
-      vi.mocked(prisma.userBook.findFirst).mockResolvedValue({
-        id: "userbook-123",
-        userId: "other-user-id", // Different user
-        bookId: "book-123",
-      } as any);
-
-      const result = await updateUserBookAction("book-123", {
-        status: "reading",
-      });
-
-      expect(result.success).toBe(false);
-      if (!result.success) {
-        expect(result.error.message).toBe("権限がありません");
-      }
-    });
   });
 
   describe("deleteUserBookAction", () => {
     it("should delete user book successfully", async () => {
       const { prisma } = await import("@/lib/prisma");
-      vi.mocked(prisma.userBook.findFirst).mockResolvedValue({
+      vi.mocked(prisma.userBook.findUnique).mockResolvedValue({
         id: "userbook-123",
         userId: "test-user-id",
         bookId: "book-123",
@@ -133,7 +113,7 @@ describe("Book Actions", () => {
 
     it("should return error when book not found", async () => {
       const { prisma } = await import("@/lib/prisma");
-      vi.mocked(prisma.userBook.findFirst).mockResolvedValue(null);
+      vi.mocked(prisma.userBook.findUnique).mockResolvedValue(null);
 
       const result = await deleteUserBookAction("book-123");
 

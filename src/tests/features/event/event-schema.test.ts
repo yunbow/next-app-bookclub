@@ -12,7 +12,7 @@ describe("Event Schema", () => {
       const validData = {
         title: "Book Club Meeting",
         description: "Monthly book club",
-        eventDate: new Date("2024-12-31"),
+        eventDate: new Date("2024-12-31").toISOString(),
         location: "Tokyo",
         isOnline: false,
         maxParticipants: 10,
