@@ -30,7 +30,7 @@ test.describe("Event Creation", () => {
   test("should participate in event", async ({ page }) => {
     // イベント一覧ページに移動
     await page.goto("/clubs");
-    await page.click("a").first();
+    await page.locator("a").first().click();
 
     // 参加ボタンをクリック
     await page.click("button:has-text('参加する')");
@@ -44,7 +44,7 @@ test.describe("Event Creation", () => {
 
   test("should cancel participation", async ({ page }) => {
     await page.goto("/clubs");
-    await page.click("a").first();
+    await page.locator("a").first().click();
 
     // 参加
     await page.click("button:has-text('参加する')");

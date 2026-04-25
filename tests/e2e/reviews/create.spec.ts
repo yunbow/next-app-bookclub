@@ -10,13 +10,13 @@ test.describe("Review Creation", () => {
   test("should create a new review", async ({ page }) => {
     // 書籍詳細ページに移動
     await page.goto("/books");
-    await page.click("a:has-text('Test Book')").first();
+    await page.locator("a:has-text('Test Book')").first().click();
 
     // レビューを書くボタンをクリック
     await page.click("button:has-text('レビューを書く')");
 
     // フォーム入力
-    await page.click("button:has-text('⭐')").nth(4); // 5つ星
+    await page.locator("button:has-text('⭐')").nth(4).click(); // 5つ星
     await page.fill('textarea[id="content"]', "This is a great book!");
 
     // 送信
@@ -32,7 +32,7 @@ test.describe("Review Creation", () => {
   test("should add reaction to review", async ({ page }) => {
     // レビュー詳細ページに移動
     await page.goto("/reviews");
-    await page.click("a").first();
+    await page.locator("a").first().click();
 
     // いいねボタンをクリック
     await page.click("button:has-text('👍')");
@@ -43,7 +43,7 @@ test.describe("Review Creation", () => {
 
   test("should show validation errors", async ({ page }) => {
     await page.goto("/books");
-    await page.click("a:has-text('Test Book')").first();
+    await page.locator("a:has-text('Test Book')").first().click();
     await page.click("button:has-text('レビューを書く')");
 
     // 内容なしで送信

@@ -68,7 +68,7 @@ describe("Book Actions", () => {
 
     it("should return error when not authenticated", async () => {
       const { auth } = await import("@/lib/auth/config");
-      vi.mocked(auth).mockResolvedValueOnce(null);
+      vi.mocked(auth).mockResolvedValueOnce(null as never);
 
       const result = await createBookAction({
         title: "Test Book",

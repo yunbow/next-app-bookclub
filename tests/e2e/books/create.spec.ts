@@ -40,7 +40,7 @@ test.describe("Book Creation", () => {
   test("should update reading status", async ({ page }) => {
     // 既存の書籍ページに移動
     await page.goto("/books");
-    await page.click("a:has-text('Test Book')").first();
+    await page.locator("a:has-text('Test Book')").first().click();
 
     // ステータス変更
     await page.click("button:has-text('ステータスを設定')");
