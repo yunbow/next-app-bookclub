@@ -70,21 +70,12 @@ ENV HOSTNAME=0.0.0.0
 RUN addgroup --system --gid 1001 nodejs \
  && adduser --system --uid 1001 nextjs
 
-# Build artifact をコピー。node_modules は builder stage から丸ごと運ぶ
-# （prisma generate 済みの .prisma フォルダも同梱される）。
-# next.config で `output: "standalone"` を有効化した場合は以下 4 行を
-# コメントアウトし、下のコメントブロックに差し替える。
-COPY --from=builder --chown=nextjs:nodejs /app/node_modules ./node_modules
-COPY --from=builder --chown=nextjs:nodejs /app/.next ./.next
+# Standalone output: 必要最小の依存と server.js のみコピー
+COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
+COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 COPY --from=builder --chown=nextjs:nodejs /app/public ./public
-COPY --from=builder --chown=nextjs:nodejs /app/package.json ./package.json
+# Prisma migration / schema は runtime に必要
 COPY --from=builder --chown=nextjs:nodejs /app/prisma ./prisma
-# ↓ standalone 有効化時はこのブロックに差し替える
-# COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
-# COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
-# COPY --from=builder --chown=nextjs:nodejs /app/public ./public
-# COPY --from=builder --chown=nextjs:nodejs /app/prisma ./prisma
-# CMD ["node", "server.js"]
 
 USER nextjs
 EXPOSE 3000
@@ -94,4 +85,4 @@ EXPOSE 3000
 HEALTHCHECK --interval=30s --timeout=3s --start-period=15s --retries=3 \
   CMD node -e "fetch('http://localhost:3000/api/health').then(r => { if (!r.ok) process.exit(1); }).catch(() => process.exit(1))"
 
-CMD ["npm", "start"]
+CMD ["node", "server.js"]
