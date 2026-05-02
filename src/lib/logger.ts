@@ -1,55 +1,39 @@
-// Simple console-based logger
-const isDevelopment = process.env.NODE_ENV === "development";
+import pino from "pino";
+import { env } from "@/lib/config/env";
 
-type LogLevel = "info" | "warn" | "error" | "debug";
-
-function log(level: LogLevel, message: string, data?: Record<string, unknown>) {
-  const timestamp = new Date().toISOString();
-  const logData = data ? ` ${JSON.stringify(data)}` : "";
-  
-  if (isDevelopment) {
-    console[level](`[${timestamp}] [${level.toUpperCase()}] ${message}${logData}`);
-  } else {
-    console[level](JSON.stringify({ timestamp, level, message, ...data }));
-  }
-}
-
-export const logger = {
-  info: (message: string | Record<string, unknown>, msg?: string) => {
-    if (typeof message === "string") {
-      log("info", message);
-    } else {
-      log("info", msg || "", message);
-    }
+export const logger = pino({
+  level: env.LOG_LEVEL ?? (env.NODE_ENV === "development" ? "debug" : "info"),
+  transport:
+    env.NODE_ENV === "development"
+      ? {
+          target: "pino-pretty",
+          options: {
+            colorize: true,
+            translateTime: "SYS:standard",
+            ignore: "pid,hostname",
+          },
+        }
+      : undefined,
+  formatters: {
+    level: (label) => ({ level: label }),
   },
-  warn: (message: string | Record<string, unknown>, msg?: string) => {
-    if (typeof message === "string") {
-      log("warn", message);
-    } else {
-      log("warn", msg || "", message);
-    }
+  timestamp: pino.stdTimeFunctions.isoTime,
+  redact: {
+    paths: [
+      "password", "*.password",
+      "secret", "*.secret",
+      "token", "*.token",
+      "accessToken", "*.accessToken",
+      "refreshToken", "*.refreshToken",
+      "creditCard", "*.creditCard",
+      "authorization", "*.authorization",
+      "headers.cookie", "headers['set-cookie']", "headers.authorization",
+      "req.headers.cookie", "req.headers.authorization",
+    ],
+    censor: "[REDACTED]",
   },
-  error: (message: string | Record<string, unknown>, msg?: string) => {
-    if (typeof message === "string") {
-      log("error", message);
-    } else {
-      log("error", msg || "", message);
-    }
-  },
-  debug: (message: string | Record<string, unknown>, msg?: string) => {
-    if (typeof message === "string") {
-      log("debug", message);
-    } else {
-      log("debug", msg || "", message);
-    }
-  },
-  child: (context: Record<string, unknown>) => ({
-    info: (msg: string) => log("info", msg, context),
-    warn: (msg: string) => log("warn", msg, context),
-    error: (msg: string) => log("error", msg, context),
-    debug: (msg: string) => log("debug", msg, context),
-  }),
-};
+  base: { service: "next-app-bookclub", env: env.NODE_ENV },
+});
 
 export function createRequestLogger(requestId: string, traceId?: string) {
   return logger.child({ requestId, traceId: traceId || requestId });
