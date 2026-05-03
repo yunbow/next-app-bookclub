@@ -80,7 +80,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         <SkipLink />
         <div className="flex min-h-screen">
           <Sidebar />
-          <main id="main-content" className="flex-1 p-4 md:p-6 pb-20 md:pb-6">{children}</main>
+          <main id="main-content" className="flex-1 p-4 pb-20 md:px-6 md:pb-6">{children}</main>
           <MobileNav />
         </div>
       </>

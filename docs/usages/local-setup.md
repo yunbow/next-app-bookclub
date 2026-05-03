@@ -81,7 +81,44 @@ npm run db:migrate:status
 
 > Prisma Studio で DB の中身を確認したい場合は `npx prisma studio`。
 
-## 5. 開発サーバーの起動
+## 5. テストデータ（シード）の投入
+
+ローカルですぐに動作確認できるよう、ユーザー / 書籍 / レビュー / コメントを投入するシードを用意しています。
+
+### 5.1 シードの起動方法
+
+| コマンド | 内容 |
+| --- | --- |
+| `npm run db:seed` | 引数なし。`NODE_ENV=development` なら dev、それ以外（未設定 / `production`）なら prod として実行（フェイルセーフ） |
+| `npm run db:seed:dev` | 明示的に dev モード（ユーザー・書籍・レビュー等を投入） |
+| `npm run db:seed:prod` | 明示的に prod モード（マスタのみ投入） |
+| `npx prisma db seed` | Prisma 標準連携。`package.json` の `prisma.seed` 経由で同じスクリプトを実行 |
+
+> 安全装置: `NODE_ENV=production` で `--mode=dev` または `SEED_MODE=dev` を指定した場合は起動時にエラーで停止します。
+
+### 5.2 シード構成
+
+| ファイル | 役割 |
+| --- | --- |
+| `prisma/seed.ts` | エントリーポイント。`--mode=` 引数 → `SEED_MODE` 環境変数 → `NODE_ENV` の優先順でモードを解決 |
+| `prisma/seeds/common.ts` | 両モード共通のマスタ（ジャンル等） |
+| `prisma/seeds/prod.ts` | 本番用（マスタのみ） |
+| `prisma/seeds/dev.ts` | 開発用（ユーザー 2 名 / 書籍 / レビュー / コメント / UserBook） |
+
+シードはすべて upsert または「存在チェック → 作成」で書かれているため、何度実行しても冪等です。
+
+### 5.3 開発用ログイン情報
+
+`db:seed:dev` 実行後、以下のアカウントでログインできます。
+
+| Email | Password |
+| --- | --- |
+| `alice@example.com` | `password123` |
+| `bob@example.com` | `password123` |
+
+それぞれが書籍 1 冊ずつをレビュー投稿し、相互にコメント / `UserBook`（読書ステータス）も登録済みです。ログイン直後にダッシュボードや書評一覧で動作確認できます。
+
+## 6. 開発サーバーの起動
 
 ```bash
 npm run dev
@@ -89,7 +126,7 @@ npm run dev
 
 ブラウザで http://localhost:3000 を開いて表示されれば成功です。
 
-## 6. 動作確認用のコマンド
+## 7. 動作確認用のコマンド
 
 | コマンド | 内容 |
 | --- | --- |
@@ -113,7 +150,7 @@ npx playwright install
 
 E2E テストは `npm run dev` で起動するサーバーを使用します（`playwright.config.ts` の `webServer` 設定により自動起動）。
 
-## 7. よく使う Prisma 操作
+## 8. よく使う Prisma 操作
 
 | 操作 | コマンド |
 | --- | --- |
@@ -122,7 +159,7 @@ E2E テストは `npm run dev` で起動するサーバーを使用します（`
 | DB をリセット（破壊的） | `npx prisma migrate reset` |
 | GUI で DB を確認 | `npx prisma studio` |
 
-## 8. トラブルシューティング
+## 9. トラブルシューティング
 
 ### `prisma generate` が失敗する
 
@@ -148,7 +185,7 @@ npm install
 PORT=3001 npm run dev
 ```
 
-## 9. ディレクトリ構成（抜粋）
+## 10. ディレクトリ構成（抜粋）
 
 ```
 .

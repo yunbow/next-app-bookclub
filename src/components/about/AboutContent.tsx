@@ -1,7 +1,7 @@
 "use client";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Mail, BookOpen } from "lucide-react";
+import { Mail, BookOpen, FileText } from "lucide-react";
 import { useTranslations } from "@/lib/i18n";
 
 export function AboutContent() {
@@ -40,6 +40,47 @@ export function AboutContent() {
                   aria-label={t("about.opensInNewTab", { name: "GitHub" })}
                 >
                   GitHub
+                </a>
+              </div>
+
+              <div className="flex items-center gap-3">
+                <FileText className="h-5 w-5 text-muted-foreground" aria-hidden="true" />
+                <a
+                  href="https://qiita.com/yun_bow"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-primary hover:underline"
+                  aria-label={t("about.opensInNewTab", { name: "Qiita" })}
+                >
+                  Qiita
+                </a>
+              </div>
+
+              <div className="flex items-center gap-3">
+                <FileText className="h-5 w-5 text-muted-foreground" aria-hidden="true" />
+                <a
+                  href="https://zenn.dev/yun_bow"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-primary hover:underline"
+                  aria-label={t("about.opensInNewTab", { name: "Zenn" })}
+                >
+                  Zenn
+                </a>
+              </div>
+
+              <div className="flex items-center gap-3">
+                <svg className="h-5 w-5 text-muted-foreground" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                  <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+                </svg>
+                <a
+                  href="https://twitter.com/yun_bow"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-primary hover:underline"
+                  aria-label={t("about.opensInNewTab", { name: "X (Twitter)" })}
+                >
+                  X (Twitter)
                 </a>
               </div>
             </div>

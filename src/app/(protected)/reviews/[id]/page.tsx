@@ -75,7 +75,7 @@ export default async function ReviewDetailPage({ params }: Props) {
   }
 
   return (
-    <div className="container max-w-4xl py-8">
+    <div className="container max-w-4xl pb-8">
       <ReviewDetail review={review} currentUserId={session.user.id} />
     </div>
   );

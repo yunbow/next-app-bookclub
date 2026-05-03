@@ -13,7 +13,7 @@ export default async function BookmarksPage() {
   const bookmarks = await getUserBookmarks();
 
   return (
-    <div className="container max-w-6xl py-8">
+    <div className="container max-w-6xl pb-8">
       <h1 className="text-3xl font-bold mb-6">ブックマーク</h1>
 
       {bookmarks.length === 0 ? (

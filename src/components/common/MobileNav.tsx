@@ -6,22 +6,22 @@ import { useSession } from "next-auth/react";
 import { cn } from "@/lib/utils";
 import { useTranslations } from "@/lib/i18n";
 import {
-  HomeIcon,
   SearchIcon,
   BookIcon,
   UsersIcon,
   UserIcon,
 } from "./icons";
+import { LayoutDashboard } from "lucide-react";
 
 type MobileNavItem = {
-  labelKey: "home" | "search" | "books" | "clubs" | "profile";
+  labelKey: "dashboard" | "search" | "books" | "clubs" | "profile";
   href: string;
   icon: React.ReactNode;
   authRequired?: boolean;
 };
 
 const mobileNavItems: MobileNavItem[] = [
-  { labelKey: "home", href: "/home", icon: <HomeIcon className="h-6 w-6" /> },
+  { labelKey: "dashboard", href: "/dashboard", icon: <LayoutDashboard className="h-6 w-6" /> },
   { labelKey: "search", href: "/search", icon: <SearchIcon className="h-6 w-6" /> },
   { labelKey: "books", href: "/books", icon: <BookIcon className="h-6 w-6" /> },
   { labelKey: "clubs", href: "/clubs", icon: <UsersIcon className="h-6 w-6" /> },
@@ -45,10 +45,9 @@ export function MobileNav() {
       <div className="flex justify-around items-center h-16">
         {filteredNavItems.map((item) => {
           const href = item.href === "/profile" && session?.user?.id
-            ? `/profile/${session.user.id}`
+            ? `/users/${session.user.id}`
             : item.href;
-          const isActive = pathname === item.href || pathname === href ||
-            (item.href === "/home" && pathname === "/home");
+          const isActive = pathname === item.href || pathname === href;
 
           const label = t(`nav.${item.labelKey}`);
           return (

@@ -10,7 +10,7 @@ export default async function NewBookPage() {
   }
 
   return (
-    <div className="container max-w-3xl py-8">
+    <div className="container max-w-3xl pb-8">
       <h1 className="text-2xl font-bold mb-6">書籍を登録</h1>
       <BookForm />
     </div>

@@ -39,11 +39,11 @@ export const en: Translations = {
   // Navigation
   nav: {
     home: "Home",
+    dashboard: "Dashboard",
     search: "Search",
     books: "Browse Books",
     clubs: "Book Clubs",
     events: "Events",
-    myLibrary: "My Library",
     bookmarks: "Bookmarks",
     notifications: "Notifications",
     profile: "Profile",

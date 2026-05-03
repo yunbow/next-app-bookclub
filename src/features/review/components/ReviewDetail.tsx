@@ -80,20 +80,27 @@ export function ReviewDetail({ review, currentUserId }: ReviewDetailProps) {
       <Card>
         <CardHeader>
           <div className="flex items-start gap-4 mb-4">
-            {review.user.image ? (
-              <img
-                src={review.user.image}
-                alt={review.user.name || "User"}
-                className="h-12 w-12 rounded-full"
-              />
-            ) : (
-              <div className="h-12 w-12 rounded-full bg-muted flex items-center justify-center">
-                <span>{review.user.name?.[0] || "U"}</span>
-              </div>
-            )}
+            <Link href={`/users/${review.user.id}`} className="hover:opacity-80">
+              {review.user.image ? (
+                <img
+                  src={review.user.image}
+                  alt={review.user.name || "User"}
+                  className="h-12 w-12 rounded-full"
+                />
+              ) : (
+                <div className="h-12 w-12 rounded-full bg-muted flex items-center justify-center">
+                  <span>{review.user.name?.[0] || "U"}</span>
+                </div>
+              )}
+            </Link>
             <div className="flex-1">
               <div className="flex items-center gap-2 mb-1">
-                <span className="font-semibold">{review.user.name}</span>
+                <Link
+                  href={`/users/${review.user.id}`}
+                  className="font-semibold hover:underline"
+                >
+                  {review.user.name}
+                </Link>
                 <span className="text-sm text-muted-foreground">
                   {formatDistanceToNow(new Date(review.createdAt), {
                     addSuffix: true,
@@ -157,20 +164,27 @@ export function ReviewDetail({ review, currentUserId }: ReviewDetailProps) {
             <div className="space-y-4">
               {review.comments.map((comment) => (
                 <div key={comment.id} className="flex gap-3">
-                  {comment.user.image ? (
-                    <img
-                      src={comment.user.image}
-                      alt={comment.user.name || "User"}
-                      className="h-8 w-8 rounded-full"
-                    />
-                  ) : (
-                    <div className="h-8 w-8 rounded-full bg-muted flex items-center justify-center text-xs">
-                      {comment.user.name?.[0] || "U"}
-                    </div>
-                  )}
+                  <Link href={`/users/${comment.user.id}`} className="hover:opacity-80">
+                    {comment.user.image ? (
+                      <img
+                        src={comment.user.image}
+                        alt={comment.user.name || "User"}
+                        className="h-8 w-8 rounded-full"
+                      />
+                    ) : (
+                      <div className="h-8 w-8 rounded-full bg-muted flex items-center justify-center text-xs">
+                        {comment.user.name?.[0] || "U"}
+                      </div>
+                    )}
+                  </Link>
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-1">
-                      <span className="font-semibold text-sm">{comment.user.name}</span>
+                      <Link
+                        href={`/users/${comment.user.id}`}
+                        className="font-semibold text-sm hover:underline"
+                      >
+                        {comment.user.name}
+                      </Link>
                       <span className="text-xs text-muted-foreground">
                         {formatDistanceToNow(new Date(comment.createdAt), {
                           addSuffix: true,

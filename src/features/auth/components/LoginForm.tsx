@@ -41,7 +41,7 @@ export function LoginForm() {
       if (result?.error) {
         setError(t("login.invalidCredentials"));
       } else {
-        window.location.href = "/home";
+        window.location.href = "/dashboard";
       }
     } catch {
       setError(t("login.failed"));
@@ -52,7 +52,7 @@ export function LoginForm() {
 
   const handleOAuthSignIn = async (provider: "google" | "github") => {
     setIsLoading(true);
-    await signIn(provider, { callbackUrl: "/home" });
+    await signIn(provider, { callbackUrl: "/dashboard" });
   };
 
   return (

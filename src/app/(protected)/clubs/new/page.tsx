@@ -10,7 +10,7 @@ export default async function NewEventPage() {
   }
 
   return (
-    <div className="container max-w-3xl py-8">
+    <div className="container max-w-3xl pb-8">
       <h1 className="text-2xl font-bold mb-6">読書会を作成</h1>
       <EventForm />
     </div>

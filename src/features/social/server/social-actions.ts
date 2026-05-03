@@ -71,7 +71,7 @@ export async function followUserAction(
       "User followed"
     );
 
-    revalidatePath(`/profile/${userId}`);
+    revalidatePath(`/users/${userId}`);
     return { success: true, data: { following: true } };
   });
 }
@@ -108,7 +108,7 @@ export async function unfollowUserAction(
       "User unfollowed"
     );
 
-    revalidatePath(`/profile/${userId}`);
+    revalidatePath(`/users/${userId}`);
     return { success: true, data: { following: false } };
   });
 }
@@ -172,7 +172,7 @@ export async function blockUserAction(
       "User blocked"
     );
 
-    revalidatePath(`/profile/${userId}`);
+    revalidatePath(`/users/${userId}`);
     return { success: true, data: { blocked: true } };
   });
 }
@@ -209,7 +209,7 @@ export async function unblockUserAction(
       "User unblocked"
     );
 
-    revalidatePath(`/profile/${userId}`);
+    revalidatePath(`/users/${userId}`);
     return { success: true, data: { blocked: false } };
   });
 }

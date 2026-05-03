@@ -29,7 +29,7 @@ export default async function AccountPage() {
   }
 
   return (
-    <div className="container max-w-4xl py-8">
+    <div className="container max-w-4xl pb-8">
       <div className="mb-6">
         <Link href="/settings">
           <Button variant="ghost" size="sm" className="mb-4">

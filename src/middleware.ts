@@ -11,12 +11,12 @@ function generateRequestId(): string {
 }
 
 const protectedRoutes = [
-  "/home",
+  "/dashboard",
   "/books",
   "/clubs",
   "/events",
-  "/library",
   "/profile",
+  "/users",
   "/settings",
   "/search",
 ];
@@ -68,7 +68,7 @@ export function middleware(req: NextRequest) {
 
   // 6. Redirect authenticated users from login page
   if (pathname === "/login" && isLoggedIn) {
-    return NextResponse.redirect(new URL("/home", req.url));
+    return NextResponse.redirect(new URL("/dashboard", req.url));
   }
 
   // 7. CSP nonce generation

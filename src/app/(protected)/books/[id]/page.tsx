@@ -73,7 +73,7 @@ export default async function BookDetailPage({ params }: Props) {
   }
 
   return (
-    <div className="container max-w-6xl py-8">
+    <div className="container max-w-6xl pb-8">
       <Link href="/books" className="inline-block mb-6">
         <Button variant="ghost" size="sm" className="gap-2">
           <ChevronLeft className="h-4 w-4" />

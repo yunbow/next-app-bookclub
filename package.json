@@ -21,7 +21,13 @@
     "postinstall": "node scripts/fix-date-fns-types.js && prisma generate",
     "db:migrate:dev": "prisma migrate dev",
     "db:migrate:deploy": "prisma migrate deploy",
-    "db:migrate:status": "prisma migrate status"
+    "db:migrate:status": "prisma migrate status",
+    "db:seed": "tsx prisma/seed.ts",
+    "db:seed:dev": "tsx prisma/seed.ts --mode=dev",
+    "db:seed:prod": "tsx prisma/seed.ts --mode=prod"
+  },
+  "prisma": {
+    "seed": "tsx prisma/seed.ts"
   },
   "dependencies": {
     "@auth/prisma-adapter": "^2.11.1",
@@ -70,6 +76,7 @@
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19",
     "@vitejs/plugin-react": "^5.1.4",
+    "dotenv": "^17.4.2",
     "eslint": "^9.39.2",
     "eslint-config-next": "^16.1.6",
     "jsdom": "^29.0.2",
@@ -77,6 +84,7 @@
     "prettier-plugin-tailwindcss": "^0.7.2",
     "prisma": "^6.19.2",
     "tailwindcss": "^4.2.0",
+    "tsx": "^4.21.0",
     "typescript": "^5",
     "vitest": "^4.0.18"
   }

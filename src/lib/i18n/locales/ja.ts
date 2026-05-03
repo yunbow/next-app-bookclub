@@ -28,11 +28,11 @@ export type Translations = {
   };
   nav: {
     home: string;
+    dashboard: string;
     search: string;
     books: string;
     clubs: string;
     events: string;
-    myLibrary: string;
     bookmarks: string;
     notifications: string;
     profile: string;
@@ -229,11 +229,11 @@ export const ja: Translations = {
   // Navigation
   nav: {
     home: "ホーム",
+    dashboard: "ダッシュボード",
     search: "検索",
     books: "本を探す",
     clubs: "読書会",
     events: "イベント",
-    myLibrary: "マイ本棚",
     bookmarks: "ブックマーク",
     notifications: "通知",
     profile: "プロフィール",

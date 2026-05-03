@@ -40,7 +40,7 @@ export default async function EventsPage({ searchParams }: Props) {
   });
 
   return (
-    <div className="container max-w-6xl py-8">
+    <div className="container max-w-6xl pb-8">
       <div className="flex items-center justify-between mb-6">
         <div>
           <h1 className="text-2xl font-bold">読書会</h1>

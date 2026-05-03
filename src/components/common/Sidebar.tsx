@@ -16,33 +16,30 @@ import {
 } from "@/components/ui/dialog";
 import { useState } from "react";
 import {
-  HomeIcon,
   BookIcon,
   UsersIcon,
-  LibraryIcon,
   UserIcon,
   SettingsIcon,
   BookmarkIcon,
   BellIcon,
 } from "./icons";
 import { useTranslations } from "@/lib/i18n";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, LayoutDashboard } from "lucide-react";
 
 type NavItem = {
-  labelKey: "home" | "books" | "clubs" | "myLibrary" | "bookmarks" | "notifications" | "profile" | "settings";
+  labelKey: "dashboard" | "books" | "clubs" | "bookmarks" | "notifications" | "profile" | "settings";
   href: string;
   icon: React.ReactNode;
   authRequired?: boolean;
 };
 
 const getNavItems = (userId?: string): NavItem[] => [
-  { labelKey: "home", href: "/home", icon: <HomeIcon /> },
+  { labelKey: "dashboard", href: "/dashboard", icon: <LayoutDashboard className="h-5 w-5" /> },
   { labelKey: "books", href: "/books", icon: <BookIcon /> },
   { labelKey: "clubs", href: "/clubs", icon: <UsersIcon /> },
-  { labelKey: "myLibrary", href: "/library", icon: <LibraryIcon />, authRequired: true },
   { labelKey: "bookmarks", href: "/bookmarks", icon: <BookmarkIcon />, authRequired: true },
   { labelKey: "notifications", href: "/notifications", icon: <BellIcon />, authRequired: true },
-  { labelKey: "profile", href: userId ? `/profile/${userId}` : "/home", icon: <UserIcon />, authRequired: true },
+  { labelKey: "profile", href: userId ? `/users/${userId}` : "/dashboard", icon: <UserIcon />, authRequired: true },
   { labelKey: "settings", href: "/settings", icon: <SettingsIcon />, authRequired: true },
 ];
 
@@ -83,7 +80,7 @@ export function Sidebar() {
       {/* ロゴ + 開閉ボタン */}
       <div className="flex items-center justify-between p-4 border-b">
         {!isCollapsed && (
-          <Link href="/home" className="text-xl font-bold" aria-label={t("accessibility.homeLink")}>
+          <Link href="/dashboard" className="text-xl font-bold" aria-label={t("accessibility.homeLink")}>
             {t("common.appName")}
           </Link>
         )}
@@ -118,7 +115,7 @@ export function Sidebar() {
             href={item.href}
             className={cn(
               "flex items-center rounded-lg px-3 py-2 text-sm font-medium transition-all duration-200 hover:bg-accent hover:text-accent-foreground relative",
-              pathname === item.href || (item.href === "/home" && pathname === "/home")
+              pathname === item.href
                 ? "bg-accent text-accent-foreground"
                 : "text-muted-foreground",
               isCollapsed ? "justify-center px-2" : "gap-3"

@@ -2,7 +2,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 
 export default function BooksLoading() {
   return (
-    <div className="container max-w-6xl py-8 space-y-6" role="status" aria-label="Loading">
+    <div className="container max-w-6xl pb-8 space-y-6" role="status" aria-label="Loading">
       {/* ヘッダー */}
       <div className="flex items-center justify-between" aria-hidden="true">
         <Skeleton className="h-8 w-48" />

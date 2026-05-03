@@ -40,5 +40,5 @@ export async function updateUserFavoriteGenres(genreIds: string[]) {
       : []),
   ]);
 
-  revalidatePath(`/profile/${userId}`);
+  revalidatePath(`/users/${userId}`);
 }

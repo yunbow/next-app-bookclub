@@ -64,7 +64,7 @@ export default async function EventDetailPage({ params }: Props) {
   }
 
   return (
-    <div className="container max-w-4xl py-8">
+    <div className="container max-w-4xl pb-8">
       <EventDetail event={event} currentUserId={session.user.id} />
     </div>
   );

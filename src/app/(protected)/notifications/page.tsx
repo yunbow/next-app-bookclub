@@ -12,7 +12,7 @@ export default async function NotificationsPage() {
   const { notifications } = await getNotifications(50);
 
   return (
-    <div className="container max-w-3xl py-8">
+    <div className="container max-w-3xl pb-8">
       <h1 className="text-3xl font-bold mb-6">通知</h1>
       <NotificationList initialNotifications={notifications} />
     </div>
