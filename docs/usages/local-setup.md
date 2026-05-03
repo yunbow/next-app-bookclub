@@ -203,3 +203,128 @@ PORT=3001 npm run dev
 ├── .env.example         # 環境変数サンプル
 └── package.json
 ```
+
+---
+
+## PostgreSQL 構築・運用手順
+
+このプロジェクトは独立した PostgreSQL コンテナを `docker-compose.yml` で持つ設計です。本プロジェクトの DB は **ホスト側ポート `54322`** で公開されます (他の `next-app-*` プロジェクトとは衝突しないよう個別に割り当て済み)。
+
+### 前提
+
+- **Docker Desktop** が起動していること (`docker version` が通る)
+- `.env` に `DATABASE_URL` が入っていること
+- `npm install` 完了
+
+### 1. PostgreSQL コンテナを起動
+
+プロジェクトのルートで:
+
+```powershell
+docker compose up -d
+```
+
+- `-d` でバックグラウンド起動
+- 初回はイメージ pull で 1〜2 分かかる
+- 2 回目以降は数秒で立ち上がる
+
+起動確認:
+
+```powershell
+docker compose ps
+```
+
+`STATUS` 列が `Up (healthy)` になっていれば OK (compose の healthcheck で `pg_isready` を見ている)。`(starting)` の間は接続失敗するので、healthy になるまで数秒待つ。
+
+### 2. マイグレーション適用
+
+スキーマを DB に反映 (初回 = テーブル作成、2 回目以降 = 差分適用):
+
+```powershell
+npm run db:migrate:dev
+```
+
+新しい migration を生成したいときは `--name` を渡す:
+
+```powershell
+npm run db:migrate:dev -- --name <name>
+```
+
+CI / 本番系では対話処理を伴わない deploy 系を使う:
+
+```powershell
+npm run db:migrate:deploy
+```
+
+### 3. SEED 投入 (任意)
+
+開発用テストデータを投入:
+
+```powershell
+npm run db:seed:dev
+```
+
+冪等なので何度実行しても重複しません。
+
+### 4. アプリ起動
+
+```powershell
+npm run dev
+```
+
+`http://localhost:3000` にアクセスして動作確認。
+
+### 5. データ確認・操作
+
+GUI で中身を見たい場合:
+
+```powershell
+npm run prisma:studio
+```
+
+`http://localhost:5555` で Prisma Studio が開きます。
+
+CLI で直接 psql に入りたい場合:
+
+```powershell
+docker compose exec db psql -U app -d app
+```
+
+### ライフサイクル運用
+
+| 操作 | コマンド | 備考 |
+| --- | --- | --- |
+| 停止 (データ保持) | `docker compose stop` | 次回 `start` で即復帰 |
+| 再開 | `docker compose start` | |
+| 完全停止＋コンテナ削除 | `docker compose down` | ボリュームは残る |
+| **DB を完全リセット** | `docker compose down -v` | ⚠ 全データ消失 |
+| ログ追跡 | `docker compose logs -f db` | エラー調査時 |
+
+ハマったときの定番リセット手順:
+
+```powershell
+docker compose down -v
+docker compose up -d
+npm run db:migrate:dev
+npm run db:seed:dev
+```
+
+### 複数プロジェクトを同時に起動する場合
+
+`docker-compose.yml` の `name:` フィールドが各プロジェクトで異なるため、コンテナは独立して並走できます。ホスト側ポートも 54321〜54342 で固有割当なので衝突しません。
+
+すべて起動するとメモリ消費が積み上がるので、使わないものは `docker compose stop` しておくのが無難です。
+
+全プロジェクトの DB を一覧:
+
+```powershell
+docker ps --filter "name=next-app-" --format "table {{.Names}}\t{{.Ports}}\t{{.Status}}"
+```
+
+### トラブルシューティング
+
+| 症状 | 原因 | 対処 |
+| --- | --- | --- |
+| `port is already allocated` | 該当ポートが他のサービスで使用中 | `docker compose down`、または `netstat -ano \| Select-String "54322"` で犯人を特定 |
+| `P1001: Can't reach database server` | コンテナがまだ healthy でない、もしくは `.env` の `DATABASE_URL` のポートと `docker-compose.yml` の publish ポートが不一致 | healthcheck 完了を待つ / `.env` を確認 |
+| マイグレーションが破綻 | dev 環境で発生する典型 | `docker compose down -v` で DB をリセットしてから `npm run db:migrate:dev` |
