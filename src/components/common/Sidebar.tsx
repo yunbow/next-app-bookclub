@@ -24,6 +24,7 @@ import {
   BellIcon,
 } from "./icons";
 import { useTranslations } from "@/lib/i18n";
+import { BrandLogo } from "@/components/common/BrandLogo";
 import { ChevronLeft, ChevronRight, LayoutDashboard } from "lucide-react";
 
 type NavItem = {
@@ -78,12 +79,24 @@ export function Sidebar() {
       )}
     >
       {/* ロゴ + 開閉ボタン */}
-      <div className="flex items-center justify-between p-4 border-b">
-        {!isCollapsed && (
-          <Link href="/dashboard" className="text-xl font-bold" aria-label={t("accessibility.homeLink")}>
-            {t("common.appName")}
-          </Link>
+      <div
+        className={cn(
+          "flex border-b",
+          isCollapsed ? "flex-col items-center gap-2 p-3" : "items-center justify-between p-4"
         )}
+      >
+        <Link
+          href="/dashboard"
+          className={cn(isCollapsed && "mx-auto")}
+          aria-label={t("accessibility.homeLink")}
+        >
+          <BrandLogo
+            label={t("common.appName")}
+            showText={!isCollapsed}
+            iconSize={32}
+            textClassName="text-xl"
+          />
+        </Link>
         <Button
           variant="ghost"
           size="icon"

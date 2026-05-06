@@ -4,6 +4,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { signOut } from "next-auth/react";
 import { useTranslations } from "@/lib/i18n";
+import { BrandLogo } from "@/components/common/BrandLogo";
 
 interface HeaderProps {
   user?: {
@@ -20,8 +21,12 @@ export function Header({ user }: HeaderProps) {
     <header className="border-b">
       <div className="container mx-auto flex h-16 items-center justify-between px-4">
         <div className="flex items-center gap-6">
-          <Link href="/books" className="text-xl font-bold">
-            {t("common.appName")}
+          <Link href="/books" aria-label={t("accessibility.homeLink")}>
+            <BrandLogo
+              label={t("common.appName")}
+              iconSize={32}
+              textClassName="text-xl"
+            />
           </Link>
           <nav className="flex gap-4">
             <Link

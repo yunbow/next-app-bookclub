@@ -48,7 +48,10 @@ export async function generateMetadata(): Promise<Metadata> {
     robots: process.env.VERCEL_ENV === "production"
       ? { index: true, follow: true }
       : { index: false, follow: false },
-    icons: { icon: "/icon", apple: "/apple-icon" },
+    icons: {
+      icon: "/brand/bookclub-icon.png",
+      apple: "/brand/bookclub-icon.png",
+    },
   };
 }
 
