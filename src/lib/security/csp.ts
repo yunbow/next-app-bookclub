@@ -7,6 +7,18 @@ const allowedImageHosts = [
   "*.googleusercontent.com",
 ];
 
+/** R2/MinIO の公開 URL ホストを CSP img-src に追加する */
+function getR2ImageOrigin(): string | null {
+  const publicUrl = process.env.R2_PUBLIC_URL || process.env.R2_ENDPOINT;
+  if (!publicUrl) return null;
+  try {
+    const { protocol, hostname, port } = new URL(publicUrl);
+    return port ? `${protocol}//${hostname}:${port}` : `${protocol}//${hostname}`;
+  } catch {
+    return null;
+  }
+}
+
 export function buildCspHeader(nonce: string): string {
   const directives: Record<string, string[]> = {
     "default-src": ["'self'"],
@@ -17,7 +29,13 @@ export function buildCspHeader(nonce: string): string {
       ...(isProduction ? [] : ["'unsafe-eval'"]),
     ],
     "style-src": ["'self'", "'unsafe-inline'"],
-    "img-src": ["'self'", "data:", "blob:", ...allowedImageHosts],
+    "img-src": [
+      "'self'",
+      "data:",
+      "blob:",
+      ...allowedImageHosts,
+      ...(getR2ImageOrigin() ? [getR2ImageOrigin()!] : []),
+    ],
     "frame-ancestors": ["'none'"],
     "form-action": ["'self'"],
     "base-uri": ["'self'"],
