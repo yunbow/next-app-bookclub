@@ -122,9 +122,17 @@ export type Translations = {
   };
   landing: {
     hero: {
+      kicker: string;
       title: string;
       subtitle: string;
       cta: string;
+      secondaryCta: string;
+      trust: string;
+    };
+    stats: {
+      library: string;
+      tracking: string;
+      community: string;
     };
     features: {
       title: string;
@@ -144,6 +152,20 @@ export type Translations = {
         title: string;
         description: string;
       };
+    };
+    workflow: {
+      title: string;
+      subtitle: string;
+      registerTitle: string;
+      registerDescription: string;
+      trackTitle: string;
+      trackDescription: string;
+      connectTitle: string;
+      connectDescription: string;
+    };
+    finalCta: {
+      title: string;
+      subtitle: string;
     };
   };
   cookieConsent: {
@@ -333,9 +355,17 @@ export const ja: Translations = {
   // Landing Page
   landing: {
     hero: {
+      kicker: "読書管理・レビュー・読書会をひとつに",
       title: "読書をもっと楽しく、もっと深く",
       subtitle: "本の管理、読書記録、レビュー共有、読書会まで。あなたの読書ライフをサポートします。",
       cta: "無料で始める",
+      secondaryCta: "ログイン",
+      trust: "本棚、読書目標、レビュー、イベントをまとめて管理",
+    },
+    stats: {
+      library: "本棚とステータス管理",
+      tracking: "目標・進捗・読書セッション",
+      community: "レビュー共有と読書会",
     },
     features: {
       title: "BookClubでできること",
@@ -355,6 +385,20 @@ export const ja: Translations = {
         title: "読書会",
         description: "オンライン・オフラインの読書会を開催",
       },
+    },
+    workflow: {
+      title: "読みたい気持ちを、続く習慣へ",
+      subtitle: "登録、記録、共有までをひとつの流れに。個人の読書も、仲間との読書も扱いやすくします。",
+      registerTitle: "本を集める",
+      registerDescription: "ISBN検索やGoogle Books検索で読みたい本をすばやく登録できます。",
+      trackTitle: "進捗を残す",
+      trackDescription: "読書ステータス、ページ進捗、目標、ハイライトを日々の記録として積み上げます。",
+      connectTitle: "読書を広げる",
+      connectDescription: "レビュー、グループ、イベントを通じて感想や次の一冊に出会えます。",
+    },
+    finalCta: {
+      title: "今日の一冊から始めましょう",
+      subtitle: "読みたい本を登録して、読書記録とレビューを同じ場所に残せます。",
     },
   },
 

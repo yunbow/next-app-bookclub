@@ -12,23 +12,23 @@ export function LPHeader() {
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container flex h-16 items-center justify-between px-4">
+      <div className="container flex h-16 items-center justify-between gap-3 px-4">
         <Link href="/" className="flex items-center space-x-2" aria-label={t("accessibility.homeLink")}>
           <BrandLogo
             label={t("common.appName")}
-            iconSize={36}
-            textClassName="text-2xl"
+            iconSize={32}
+            textClassName="text-xl sm:text-2xl"
           />
         </Link>
 
-        <nav className="flex items-center gap-2" aria-label={t("nav.home")}>
+        <nav className="flex shrink-0 items-center gap-1 sm:gap-2" aria-label={t("nav.home")}>
           <LanguageSwitcher />
           <ThemeSwitcher />
-          <Link href="/login">
+          <Link href="/login" className="hidden sm:block">
             <Button variant="ghost">{t("common.login")}</Button>
           </Link>
           <Link href="/register">
-            <Button>{t("common.register")}</Button>
+            <Button className="px-3 sm:px-4">{t("common.register")}</Button>
           </Link>
         </nav>
       </div>

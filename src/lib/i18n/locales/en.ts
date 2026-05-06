@@ -143,9 +143,17 @@ export const en: Translations = {
   // Landing Page
   landing: {
     hero: {
+      kicker: "Reading management, reviews, and book clubs in one place",
       title: "Make Reading More Fun and Deeper",
       subtitle: "Manage books, track reading, share reviews, and join book clubs. Support your reading life.",
       cta: "Get started for free",
+      secondaryCta: "Login",
+      trust: "Keep your shelf, goals, reviews, and events organized together",
+    },
+    stats: {
+      library: "Library and reading status",
+      tracking: "Goals, progress, and sessions",
+      community: "Reviews and book clubs",
     },
     features: {
       title: "What you can do with BookClub",
@@ -165,6 +173,20 @@ export const en: Translations = {
         title: "Book Clubs",
         description: "Host online and offline book clubs",
       },
+    },
+    workflow: {
+      title: "Turn reading intent into a steady habit",
+      subtitle: "Register, track, and share in one flow. BookClub keeps solo reading and community reading easy to manage.",
+      registerTitle: "Collect your books",
+      registerDescription: "Add books quickly with ISBN or Google Books search and keep your next reads close.",
+      trackTitle: "Track your progress",
+      trackDescription: "Build a useful history with reading status, page progress, goals, sessions, and highlights.",
+      connectTitle: "Expand the conversation",
+      connectDescription: "Share reviews, join groups, and find events that lead to your next book.",
+    },
+    finalCta: {
+      title: "Start with today’s book",
+      subtitle: "Add one book and keep your reading record and reviews in the same place.",
     },
   },
 
