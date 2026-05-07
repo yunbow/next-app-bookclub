@@ -2,7 +2,7 @@ import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Settings, Lock, KeyRound, History, Palette } from "lucide-react";
+import { Settings, Lock, KeyRound, History, Palette, CreditCard } from "lucide-react";
 
 export default async function SettingsPage() {
   const session = await auth();
@@ -12,6 +12,12 @@ export default async function SettingsPage() {
   }
 
   const settingsItems = [
+    {
+      icon: CreditCard,
+      title: "サブスクリプション",
+      description: "プランの確認・変更、支払い管理",
+      href: "/settings/billing",
+    },
     {
       icon: Palette,
       title: "外観",

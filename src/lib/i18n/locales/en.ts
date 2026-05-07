@@ -223,6 +223,8 @@ export const en: Translations = {
     colorVisionProtanopia: "Protanopia (Red)",
     colorVisionDeuteranopia: "Deuteranopia (Green)",
     colorVisionTritanopia: "Tritanopia (Blue)",
+    subscription: "Subscription",
+    subscriptionDescription: "View and change your plan, manage billing",
     account: "Account Information",
     accountDescription: "Email, user ID, and account deletion",
     loginHistory: "Login History",

@@ -11,7 +11,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Sun, Moon, Monitor, Globe, ChevronDown, Type, Eye, User, History, KeyRound } from "lucide-react";
+import { Sun, Moon, Monitor, Globe, ChevronDown, Type, Eye, User, History, KeyRound, CreditCard } from "lucide-react";
 import { useLocale, useTranslations } from "@/lib/i18n";
 import { useFontSize, type FontSize } from "@/lib/font-size";
 import { useColorVision, type ColorVisionMode } from "@/lib/color-vision";
@@ -80,6 +80,19 @@ export function SettingsContent() {
       <h1 className="text-2xl font-bold">{t("settings.title")}</h1>
 
       <div className="space-y-4">
+        {/* サブスクリプション */}
+        <Link href="/settings/billing" className="block">
+          <Card className="hover:bg-accent transition-colors cursor-pointer">
+            <CardHeader>
+              <CardTitle className="text-lg flex items-center gap-2">
+                <CreditCard className="h-5 w-5" />
+                {t("settings.subscription")}
+              </CardTitle>
+              <CardDescription>{t("settings.subscriptionDescription")}</CardDescription>
+            </CardHeader>
+          </Card>
+        </Link>
+
         {/* 外観設定 */}
         <Card>
           <CardHeader>

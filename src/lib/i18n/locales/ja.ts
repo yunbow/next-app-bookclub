@@ -196,6 +196,8 @@ export type Translations = {
     colorVisionProtanopia: string;
     colorVisionDeuteranopia: string;
     colorVisionTritanopia: string;
+    subscription: string;
+    subscriptionDescription: string;
     account: string;
     accountDescription: string;
     loginHistory: string;
@@ -435,6 +437,8 @@ export const ja: Translations = {
     colorVisionProtanopia: "1型色覚（赤）",
     colorVisionDeuteranopia: "2型色覚（緑）",
     colorVisionTritanopia: "3型色覚（青）",
+    subscription: "サブスクリプション",
+    subscriptionDescription: "プランの確認・変更、支払い管理",
     account: "アカウント情報",
     accountDescription: "メールアドレス、ユーザーID、アカウント削除",
     loginHistory: "ログイン履歴",

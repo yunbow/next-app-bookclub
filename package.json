@@ -24,7 +24,8 @@
     "db:migrate:status": "prisma migrate status",
     "db:seed": "tsx prisma/seed.ts",
     "db:seed:dev": "tsx prisma/seed.ts --mode=dev",
-    "db:seed:prod": "tsx prisma/seed.ts --mode=prod"
+    "db:seed:prod": "tsx prisma/seed.ts --mode=prod",
+    "upload:static": "tsx scripts/upload-static-images.ts"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"
@@ -62,6 +63,7 @@
     "react-dom": "^19.2.4",
     "react-hook-form": "^7.71.1",
     "sonner": "^2.0.7",
+    "stripe": "^20.4.1",
     "tailwind-merge": "^3.5.0",
     "zod": "^4.3.6"
   },
