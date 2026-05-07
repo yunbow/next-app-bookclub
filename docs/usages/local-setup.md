@@ -49,7 +49,7 @@ openssl rand -base64 48
 
 ### 4. Docker コンテナの起動
 
-PostgreSQL（DB）と MinIO（画像ストレージ）をまとめて起動します。
+PostgreSQL（DB）・MinIO（画像ストレージ）・stripe-mock（Stripe API モック）をまとめて起動します。
 
 ```bash
 docker compose up -d
@@ -108,6 +108,58 @@ npm run dev
 | バケット名 | `bookclub` |
 
 本番では Cloudflare R2 を使用します。`.env.example` の R2 セクションのコメントを外して設定してください。
+
+---
+
+## Stripe 決済（stripe-mock）
+
+`docker compose up -d` で [stripe/stripe-mock](https://github.com/stripe/stripe-mock) が起動し、Stripe API をローカルでモックします。
+
+| 項目 | 値 |
+| --- | --- |
+| HTTP エンドポイント | `http://localhost:12111` |
+| 認証 | 任意の `sk_test_*` キー（モックは検証しない） |
+
+`.env.example` に記載のモック値 (`sk_test_mock_bookclub_local` 等) をそのまま `.env` にコピーすれば、**実際の Stripe アカウントなしで** 決済フローの開発が可能です。
+
+### Webhook のローカルテスト
+
+Webhook イベントのテストには [Stripe CLI](https://stripe.com/docs/stripe-cli) を使用します。
+
+```bash
+# Stripe CLI をインストール (初回のみ)
+# macOS: brew install stripe/stripe-cli/stripe
+# Windows: https://github.com/stripe/stripe-cli/releases
+
+# stripe-mock に対して listen し、ローカルアプリに転送
+stripe listen \
+  --api-base http://localhost:12111 \
+  --forward-to http://localhost:3000/api/stripe/webhook
+```
+
+`stripe listen` を起動すると表示される `whsec_...` を `.env` の `STRIPE_WEBHOOK_SECRET` に設定してください。
+
+```bash
+# イベントを手動で発火してテスト
+stripe trigger checkout.session.completed \
+  --api-base http://localhost:12111
+```
+
+### 本番 / Stripe テストモードへの切り替え
+
+`.env` を以下のように変更します。
+
+```bash
+# STRIPE_MOCK_HOST と STRIPE_MOCK_PORT をコメントアウト（または削除）
+# STRIPE_MOCK_HOST=localhost
+# STRIPE_MOCK_PORT=12111
+
+# 本物の Stripe キーを設定
+STRIPE_SECRET_KEY=sk_test_xxxxxxxxxxxxxxxx
+STRIPE_WEBHOOK_SECRET=whsec_xxxxxxxxxxxxxxxx
+STRIPE_BASIC_PRICE_ID=price_xxxxxxxxxxxxxxxx
+STRIPE_PREMIUM_PRICE_ID=price_xxxxxxxxxxxxxxxx
+```
 
 ---
 
@@ -219,7 +271,7 @@ PORT=3001 npm run dev
 ├── tests/
 │   └── e2e/             # Playwright e2e テスト
 ├── docs/                # プロジェクトドキュメント
-├── docker-compose.yml   # PostgreSQL + MinIO
+├── docker-compose.yml   # PostgreSQL + MinIO + stripe-mock
 ├── .env.example         # 環境変数サンプル
 └── package.json
 ```

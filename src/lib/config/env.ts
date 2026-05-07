@@ -57,6 +57,8 @@ const EnvSchema = z
     STRIPE_WEBHOOK_SECRET: optionalString(z.string().min(1)),
     STRIPE_BASIC_PRICE_ID: optionalString(z.string().min(1)),
     STRIPE_PREMIUM_PRICE_ID: optionalString(z.string().min(1)),
+    STRIPE_MOCK_HOST: optionalString(z.string().min(1)),
+    STRIPE_MOCK_PORT: optionalString(z.string().regex(/^\d+$/)),
 
     NEXT_PUBLIC_APP_URL: optionalUrl(),
   })
