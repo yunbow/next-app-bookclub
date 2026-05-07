@@ -6,6 +6,7 @@ import { createReviewSchema, updateReviewSchema, createReviewCommentSchema, crea
 import type { ActionResult } from "@/lib/types/action-result";
 import { logger } from "@/lib/logger";
 import { revalidatePath } from "next/cache";
+import { getUserPlan, hasMinPlan } from "@/lib/subscription";
 
 export async function createReviewAction(
   data: unknown
@@ -15,6 +16,22 @@ export async function createReviewAction(
       const authResult = await requireAuth();
       if (!authResult.success) return authResult;
       const { userId } = authResult;
+
+      const plan = await getUserPlan(userId);
+
+      if (validData!.visibility === "draft" && !hasMinPlan(plan, "basic")) {
+        return {
+          success: false,
+          error: { code: "FORBIDDEN", message: "下書き保存はBasic以上のプランが必要です" },
+        };
+      }
+
+      if (validData!.publishAt && !hasMinPlan(plan, "premium")) {
+        return {
+          success: false,
+          error: { code: "FORBIDDEN", message: "予約投稿はPremiumプランが必要です" },
+        };
+      }
 
       const review = await prisma.review.create({
         data: {
@@ -67,6 +84,22 @@ export async function updateReviewAction(
           severity: "high",
         }, "Unauthorized review update attempt");
         return { success: false, error: { code: "FORBIDDEN", message: "権限がありません" } };
+      }
+
+      const plan = await getUserPlan(userId);
+
+      if (validData!.visibility === "draft" && !hasMinPlan(plan, "basic")) {
+        return {
+          success: false,
+          error: { code: "FORBIDDEN", message: "下書き保存はBasic以上のプランが必要です" },
+        };
+      }
+
+      if (validData!.publishAt && !hasMinPlan(plan, "premium")) {
+        return {
+          success: false,
+          error: { code: "FORBIDDEN", message: "予約投稿はPremiumプランが必要です" },
+        };
       }
 
       await prisma.review.update({

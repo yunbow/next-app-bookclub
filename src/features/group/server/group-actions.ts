@@ -5,6 +5,7 @@ import { withAction, requireAuth } from '@/lib/actions/action-helpers';
 import type { ActionResult } from '@/lib/types/action-result';
 import { logger } from '@/lib/logger';
 import { z } from 'zod';
+import { getUserPlan, hasMinPlan, PLAN_LIMITS } from '@/lib/subscription';
 
 const createGroupSchema = z.object({
   name: z.string().min(1).max(100),
@@ -23,12 +24,20 @@ const searchGroupSchema = z.object({
 });
 
 /**
- * Create a new group
+ * Create a new group (Basic+)
  */
 export async function createGroup(data: unknown): Promise<ActionResult<Record<string, unknown>>> {
   return withAction(async ({ validData }) => {
     const authResult = await requireAuth();
     if (!authResult.success) return authResult;
+
+    const plan = await getUserPlan(authResult.userId);
+    if (!hasMinPlan(plan, "basic")) {
+      return {
+        success: false,
+        error: { code: "FORBIDDEN", message: "グループ作成はBasic以上のプランが必要です" },
+      };
+    }
 
     const group = await prisma.group.create({
       data: {
@@ -153,12 +162,30 @@ export async function getGroupDetails(groupId: string): Promise<ActionResult<Rec
 }
 
 /**
- * Join a group
+ * Join a group (Free: max 3, Basic+: unlimited)
  */
 export async function joinGroup(groupId: string): Promise<ActionResult<Record<string, unknown>>> {
   return withAction(async () => {
     const authResult = await requireAuth();
     if (!authResult.success) return authResult;
+
+    const plan = await getUserPlan(authResult.userId);
+    const limit = PLAN_LIMITS.groups[plan];
+
+    if (limit !== Infinity) {
+      const currentCount = await prisma.groupMember.count({
+        where: { userId: authResult.userId },
+      });
+      if (currentCount >= limit) {
+        return {
+          success: false,
+          error: {
+            code: "FORBIDDEN",
+            message: `グループ参加はフリープランでは${limit}件までです。Basicプランにアップグレードすると無制限になります`,
+          },
+        };
+      }
+    }
 
     const group = await prisma.group.findUnique({
       where: { id: groupId },

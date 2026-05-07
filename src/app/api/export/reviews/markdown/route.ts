@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { auth } from '@/lib/auth/config';
 import { logger } from '@/lib/logger';
 import { exportReviewsAsMarkdown } from '@/features/export/server/export-actions';
+import { getUserPlan, hasMinPlan } from '@/lib/subscription';
 
 export async function GET() {
   try {
@@ -10,6 +11,14 @@ export async function GET() {
       return NextResponse.json(
         { error: { code: "UNAUTHORIZED", message: "認証が必要です" } },
         { status: 401 }
+      );
+    }
+
+    const plan = await getUserPlan(session.user.id);
+    if (!hasMinPlan(plan, "premium")) {
+      return NextResponse.json(
+        { error: { code: "FORBIDDEN", message: "データエクスポートはPremiumプランが必要です" } },
+        { status: 403 }
       );
     }
 
