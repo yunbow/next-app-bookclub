@@ -6,6 +6,7 @@ import {
   createReviewCommentAction,
   toggleReviewReactionAction,
 } from "@/features/review/server/review-actions";
+import { auth } from "@/lib/auth/config";
 
 // Mock auth
 vi.mock("@/lib/auth/config", () => ({
@@ -35,6 +36,9 @@ vi.mock("@/lib/prisma", () => ({
     },
     notification: {
       create: vi.fn(),
+    },
+    subscription: {
+      findUnique: vi.fn().mockResolvedValue(null),
     },
   },
 }));
@@ -81,6 +85,22 @@ describe("Review Actions", () => {
       expect(result.success).toBe(false);
       if (!result.success) {
         expect(result.error).toBeDefined();
+      }
+    });
+
+    it("should return UNAUTHORIZED when not authenticated", async () => {
+      vi.mocked(auth).mockResolvedValueOnce(null);
+
+      const result = await createReviewAction({
+        bookId: "book-123",
+        content: "Great book!!",
+        rating: 5,
+        visibility: "public",
+      });
+
+      expect(result.success).toBe(false);
+      if (!result.success) {
+        expect(result.error.code).toBe("UNAUTHORIZED");
       }
     });
   });
@@ -136,7 +156,7 @@ describe("Review Actions", () => {
       expect(result.success).toBe(true);
     });
 
-    it("should return error for unauthorized deletion", async () => {
+    it("should return FORBIDDEN for another user's review (IDOR prevention)", async () => {
       const { prisma } = await import("@/lib/prisma");
       vi.mocked(prisma.review.findUnique).mockResolvedValue({
         id: "review-123",
@@ -147,7 +167,18 @@ describe("Review Actions", () => {
 
       expect(result.success).toBe(false);
       if (!result.success) {
-        expect(result.error.message).toBe("権限がありません");
+        expect(result.error.code).toBe("FORBIDDEN");
+      }
+    });
+
+    it("should return UNAUTHORIZED when not authenticated", async () => {
+      vi.mocked(auth).mockResolvedValueOnce(null);
+
+      const result = await deleteReviewAction("review-123");
+
+      expect(result.success).toBe(false);
+      if (!result.success) {
+        expect(result.error.code).toBe("UNAUTHORIZED");
       }
     });
   });
