@@ -17,6 +17,12 @@ const USERS = [
     username: "bob",
     bio: "技術書を中心に読むデモユーザー Bob です。",
   },
+  {
+    email: "charlie@example.com",
+    name: "Charlie",
+    username: "charlie",
+    bio: "小説と技術書を行き来するデモユーザー Charlie です。",
+  },
 ] as const;
 
 const BOOKS = [
@@ -108,7 +114,7 @@ export async function seedDev(prisma: PrismaClient): Promise<void> {
     )
   );
 
-  const [alice, bob] = users;
+  const [alice, bob, charlie] = users;
   const [readableCode, yowamushi, mathForProgrammers, coffeeNotCold] = books;
 
   // 各ユーザーが3件ずつレビュー投稿
@@ -154,6 +160,27 @@ export async function seedDev(prisma: PrismaClient): Promise<void> {
       content:
         "アルゴリズムを学ぶ前の良い導入書。図とコードのバランスが絶妙でした。",
       rating: 4,
+    },
+    {
+      userId: charlie.id,
+      bookId: yowamushi.id,
+      content:
+        "言葉遊びと不思議な出会いが心地よく、ページをめくる手が止まりませんでした。",
+      rating: 5,
+    },
+    {
+      userId: charlie.id,
+      bookId: coffeeNotCold.id,
+      content:
+        "登場人物それぞれの想いが丁寧に描かれていて、静かな感動が積み重なる一冊。",
+      rating: 4,
+    },
+    {
+      userId: charlie.id,
+      bookId: readableCode.id,
+      content:
+        "レビュー観点のチェックリストとして手元に置いておきたい良書でした。",
+      rating: 5,
     },
   ];
 
@@ -216,6 +243,17 @@ export async function seedDev(prisma: PrismaClient): Promise<void> {
       currentPage: 120,
     },
   });
+  await prisma.userBook.upsert({
+    where: { userId_bookId: { userId: charlie.id, bookId: yowamushi.id } },
+    update: { status: "completed", rating: 5, currentPage: yowamushi.pages ?? 0 },
+    create: {
+      userId: charlie.id,
+      bookId: yowamushi.id,
+      status: "completed",
+      rating: 5,
+      currentPage: yowamushi.pages ?? 0,
+    },
+  });
 
   // alice は Premium プラン
   await prisma.subscription.upsert({
@@ -224,6 +262,17 @@ export async function seedDev(prisma: PrismaClient): Promise<void> {
     create: {
       userId: alice.id,
       plan: "premium",
+      status: "active",
+    },
+  });
+
+  // charlie は Basic プラン
+  await prisma.subscription.upsert({
+    where: { userId: charlie.id },
+    update: { plan: "basic", status: "active" },
+    create: {
+      userId: charlie.id,
+      plan: "basic",
       status: "active",
     },
   });
