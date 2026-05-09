@@ -1,7 +1,9 @@
 import { auth } from "@/lib/auth/config";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
+import { Prisma } from "@prisma/client";
 import { ReviewList } from "@/features/review/components/ReviewList";
+import { Pagination } from "@/components/common/Pagination";
 
 type Props = {
   searchParams: Promise<{ q?: string; sort?: string; page?: string }>;
@@ -21,19 +23,13 @@ export default async function ReviewsPage({ searchParams }: Props) {
   const search = params.q || "";
   const sort = params.sort || "latest";
 
-  const where: any = {
-    OR: [
-      { isPublic: true },
-      { userId: session.user.id },
-    ],
+  const where: Prisma.ReviewWhereInput = {
+    OR: [{ visibility: "public" }, { userId: session.user.id }],
+    ...(search && { content: { contains: search, mode: "insensitive" } }),
   };
 
-  if (search) {
-    where.content = { contains: search, mode: "insensitive" };
-  }
-
-  let orderBy: any = { createdAt: "desc" };
-  if (sort === "rating") orderBy = { rating: "desc" };
+  const orderBy: Prisma.ReviewOrderByWithRelationInput =
+    sort === "rating" ? { rating: "desc" } : { createdAt: "desc" };
 
   const [reviews, totalCount] = await Promise.all([
     prisma.review.findMany({
@@ -78,7 +74,14 @@ export default async function ReviewsPage({ searchParams }: Props) {
         </div>
       </div>
 
-      <ReviewList reviews={reviews as any} />
+      <ReviewList reviews={reviews} />
+
+      <Pagination
+        currentPage={page}
+        totalPages={totalPages}
+        basePath="/reviews"
+        searchParams={{ ...(search && { q: search }), sort }}
+      />
     </div>
   );
 }

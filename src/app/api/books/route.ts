@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth/config";
 import { prisma } from "@/lib/prisma";
+import { Prisma } from "@prisma/client";
 
 export async function GET(request: NextRequest) {
   const session = await auth();
@@ -14,23 +15,15 @@ export async function GET(request: NextRequest) {
   const search = searchParams.get("q");
 
   try {
-    const where: any = {};
-
-    if (status) {
-      where.userBooks = {
-        some: {
-          userId: session.user.id,
-          status,
-        },
-      };
-    }
-
-    if (search) {
-      where.OR = [
-        { title: { contains: search, mode: "insensitive" } },
-        { author: { contains: search, mode: "insensitive" } },
-      ];
-    }
+    const where: Prisma.BookWhereInput = {
+      ...(status && { userBooks: { some: { userId: session.user.id, status } } }),
+      ...(search && {
+        OR: [
+          { title: { contains: search, mode: "insensitive" } },
+          { author: { contains: search, mode: "insensitive" } },
+        ],
+      }),
+    };
 
     const books = await prisma.book.findMany({
       where,

@@ -14,9 +14,10 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { Badge } from "@/components/ui/badge";
+import type { PlanType } from "@/lib/plans";
 import {
-  BookIcon,
   UsersIcon,
   UserIcon,
   SettingsIcon,
@@ -25,7 +26,7 @@ import {
 } from "./icons";
 import { useTranslations } from "@/lib/i18n";
 import { BrandLogo } from "@/components/common/BrandLogo";
-import { ChevronLeft, ChevronRight, LayoutDashboard } from "lucide-react";
+import { ChevronLeft, ChevronRight, LayoutDashboard, Search } from "lucide-react";
 
 type NavItem = {
   labelKey: "dashboard" | "books" | "clubs" | "bookmarks" | "notifications" | "profile" | "settings";
@@ -36,7 +37,7 @@ type NavItem = {
 
 const getNavItems = (userId?: string): NavItem[] => [
   { labelKey: "dashboard", href: "/dashboard", icon: <LayoutDashboard className="h-5 w-5" /> },
-  { labelKey: "books", href: "/books", icon: <BookIcon /> },
+  { labelKey: "books", href: "/books", icon: <Search className="h-5 w-5" /> },
   { labelKey: "clubs", href: "/clubs", icon: <UsersIcon /> },
   { labelKey: "bookmarks", href: "/bookmarks", icon: <BookmarkIcon />, authRequired: true },
   { labelKey: "notifications", href: "/notifications", icon: <BellIcon />, authRequired: true },
@@ -44,11 +45,32 @@ const getNavItems = (userId?: string): NavItem[] => [
   { labelKey: "settings", href: "/settings", icon: <SettingsIcon />, authRequired: true },
 ];
 
+const PLAN_BADGE_STYLES: Record<PlanType, string> = {
+  free: "border-transparent bg-muted text-muted-foreground",
+  basic: "border-transparent bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300",
+  premium: "border-transparent bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300",
+};
+
+const PLAN_LABELS: Record<PlanType, string> = {
+  free: "Free",
+  basic: "Basic",
+  premium: "Premium",
+};
+
+function PlanBadge({ plan }: { plan: PlanType }) {
+  return (
+    <Badge className={cn("px-1.5 py-0 text-[10px] font-medium shrink-0", PLAN_BADGE_STYLES[plan])}>
+      {PLAN_LABELS[plan]}
+    </Badge>
+  );
+}
+
 export function Sidebar() {
   const pathname = usePathname();
   const { data: session } = useSession();
   const { t } = useTranslations();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [userPlan, setUserPlan] = useState<PlanType>("free");
   const [isCollapsed, setIsCollapsed] = useState(() => {
     // localStorageから初期値を読み込む
     if (typeof window !== 'undefined') {
@@ -57,6 +79,14 @@ export function Sidebar() {
     }
     return false;
   });
+
+  useEffect(() => {
+    if (!session?.user?.id) return;
+    fetch("/api/user/plan")
+      .then((res) => res.json())
+      .then((data) => setUserPlan(data.plan ?? "free"))
+      .catch(() => {});
+  }, [session?.user?.id]);
 
   const filteredNavItems = getNavItems(session?.user?.id).filter((item) => {
     // 認証が必要な項目はログイン済みユーザーのみ
@@ -168,9 +198,12 @@ export function Sidebar() {
                 </Avatar>
                 {!isCollapsed && (
                   <div className="flex-1 min-w-0">
-                    <p className="font-medium text-sm truncate">
-                      {session.user?.name || t("common.nameNotSet")}
-                    </p>
+                    <div className="flex items-center gap-1.5">
+                      <p className="font-medium text-sm truncate">
+                        {session.user?.name || t("common.nameNotSet")}
+                      </p>
+                      <PlanBadge plan={userPlan} />
+                    </div>
                     <p className="text-xs text-muted-foreground truncate">
                       {session.user?.email}
                     </p>

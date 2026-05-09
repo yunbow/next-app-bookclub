@@ -1,6 +1,7 @@
 import { auth } from "@/lib/auth/config";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
+import { Prisma } from "@prisma/client";
 import { BookList } from "@/features/book/components/BookList";
 import { BooksFilter } from "@/features/book/components/BooksFilter";
 import { BooksPagination } from "@/features/book/components/BooksPagination";
@@ -25,18 +26,15 @@ export default async function BooksPage({ searchParams }: Props) {
   const search = params.q || "";
   const sort = params.sort || "latest";
 
-  const where: any = {};
+  const where: Prisma.BookWhereInput = search
+    ? { OR: [{ title: { contains: search } }, { author: { contains: search } }] }
+    : {};
 
-  if (search) {
-    where.OR = [
-      { title: { contains: search } },
-      { author: { contains: search } },
-    ];
-  }
-
-  let orderBy: any = { createdAt: "desc" };
-  if (sort === "title") orderBy = { title: "asc" };
-  if (sort === "author") orderBy = { author: "asc" };
+  const ORDER_MAP: Record<string, Prisma.BookOrderByWithRelationInput> = {
+    title: { title: "asc" },
+    author: { author: "asc" },
+  };
+  const orderBy: Prisma.BookOrderByWithRelationInput = ORDER_MAP[sort] ?? { createdAt: "desc" };
 
   const [books, totalCount] = await Promise.all([
     prisma.book.findMany({

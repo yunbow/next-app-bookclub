@@ -117,7 +117,7 @@ export function HighlightForm({ bookId, onSuccess }: HighlightFormProps) {
 
           <div className="space-y-2">
             <Label>カラー</Label>
-            <Select value={color} onValueChange={(value) => setValue("color", value as any)}>
+            <Select value={color} onValueChange={(value) => setValue("color", value as "yellow" | "green" | "blue" | "pink")}>
               <SelectTrigger>
                 <SelectValue />
               </SelectTrigger>

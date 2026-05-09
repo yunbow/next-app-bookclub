@@ -24,7 +24,7 @@ cd next-app-bookclub
 npm install
 ```
 
-`postinstall` フックで `prisma generate`（Prisma Client の生成）が自動実行されます。
+`postinstall` フックで `scripts/fix-date-fns-types.js` の実行と `prisma generate`（Prisma Client の生成）が自動実行されます。
 
 ### 3. 環境変数の設定
 
@@ -109,6 +109,12 @@ npm run dev
 
 本番では Cloudflare R2 を使用します。`.env.example` の R2 セクションのコメントを外して設定してください。
 
+静的アセット（デフォルト書影など）を R2 / MinIO にアップロードする場合は以下を実行します。
+
+```bash
+npm run upload:static
+```
+
 ---
 
 ## Stripe 決済（stripe-mock）
@@ -120,7 +126,7 @@ npm run dev
 | HTTP エンドポイント | `http://localhost:12111` |
 | 認証 | 任意の `sk_test_*` キー（モックは検証しない） |
 
-`.env.example` に記載のモック値 (`sk_test_mock_bookclub_local` 等) をそのまま `.env` にコピーすれば、**実際の Stripe アカウントなしで** 決済フローの開発が可能です。
+`.env.example` に記載のモック値 (`sk_test_123` 等) をそのまま `.env` にコピーすれば、**実際の Stripe アカウントなしで** Free / Basic / Premium プランの決済フロー開発が可能です。
 
 ### Webhook のローカルテスト
 
@@ -171,11 +177,14 @@ STRIPE_PREMIUM_PRICE_ID=price_xxxxxxxxxxxxxxxx
 | `npm run format` | Prettier で整形 |
 | `npm run format:check` | Prettier の差分チェックのみ |
 | `npm run test` | Vitest（watch モード） |
-| `npm run test:run` | Vitest を 1 回だけ実行 |
+| `npm run test:unit` | ユニットテストを 1 回実行 |
+| `npm run test:integration` | 統合テストを 1 回実行 |
+| `npm run test:run` | 全テストを 1 回実行 |
 | `npm run test:coverage` | カバレッジ付きでテスト実行 |
-| `npm run test:e2e` | Playwright で e2e テスト |
+| `npm run test:e2e` | Playwright で E2E テスト |
 | `npm run build` | プロダクションビルド |
 | `npm start` | ビルド済みアプリの起動 |
+| `npm run upload:static` | 静的画像を R2 / MinIO へアップロード |
 
 E2E テストを初めて実行する前にブラウザバイナリを取得します。
 
@@ -262,14 +271,18 @@ PORT=3001 npm run dev
 .
 ├── prisma/              # Prisma スキーマ・マイグレーション・シード
 ├── public/              # 静的アセット
-├── scripts/             # 補助スクリプト
+├── scripts/             # 補助スクリプト（fix-date-fns-types.js, upload-static-images.ts）
 ├── src/
 │   ├── app/             # Next.js App Router
+│   │   ├── (auth)/      # 認証画面（login / register）
+│   │   ├── (protected)/ # ログイン必須画面
+│   │   └── api/         # Route Handlers
+│   ├── components/      # 共通 UI コンポーネント（Sidebar, Pagination など）
 │   ├── features/        # 機能別モジュール（schema / server / components）
-│   ├── lib/             # 共通ライブラリ（auth / prisma / storage など）
+│   ├── lib/             # 共通ライブラリ（auth / prisma / subscription など）
 │   └── tests/           # Vitest 用テスト（unit / integration）
 ├── tests/
-│   └── e2e/             # Playwright e2e テスト
+│   └── e2e/             # Playwright E2E テスト
 ├── docs/                # プロジェクトドキュメント
 ├── docker-compose.yml   # PostgreSQL + MinIO + stripe-mock
 ├── .env.example         # 環境変数サンプル

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import {
   createReviewAction,
@@ -89,7 +90,7 @@ describe("Review Actions", () => {
     });
 
     it("should return UNAUTHORIZED when not authenticated", async () => {
-      vi.mocked(auth).mockResolvedValueOnce(null);
+      vi.mocked(auth).mockResolvedValueOnce(null as never);
 
       const result = await createReviewAction({
         bookId: "book-123",
@@ -172,7 +173,7 @@ describe("Review Actions", () => {
     });
 
     it("should return UNAUTHORIZED when not authenticated", async () => {
-      vi.mocked(auth).mockResolvedValueOnce(null);
+      vi.mocked(auth).mockResolvedValueOnce(null as never);
 
       const result = await deleteReviewAction("review-123");
 

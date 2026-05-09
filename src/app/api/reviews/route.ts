@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth/config";
 import { prisma } from "@/lib/prisma";
+import { Prisma } from "@prisma/client";
 
 export async function GET(request: NextRequest) {
   const session = await auth();
@@ -13,16 +14,10 @@ export async function GET(request: NextRequest) {
   const bookId = searchParams.get("bookId");
 
   try {
-    const where: any = {
-      OR: [
-        { isPublic: true },
-        { userId: session.user.id },
-      ],
+    const where: Prisma.ReviewWhereInput = {
+      OR: [{ visibility: "public" }, { userId: session.user.id }],
+      ...(bookId && { bookId }),
     };
-
-    if (bookId) {
-      where.bookId = bookId;
-    }
 
     const reviews = await prisma.review.findMany({
       where,

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-require-imports */
 /**
  * Workaround for date-fns v4 missing .d.ts files.
  * date-fns v4 ships .d.cts but not .d.ts for some modules,

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import { createBookAction, updateUserBookAction, deleteUserBookAction } from "@/features/book/server/book-actions";
 

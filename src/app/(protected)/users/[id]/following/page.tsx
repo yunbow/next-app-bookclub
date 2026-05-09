@@ -3,16 +3,26 @@ import { redirect, notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { UserListItem } from "@/features/social/components/UserListItem";
+import { Pagination } from "@/components/common/Pagination";
 import Link from "next/link";
 import { ChevronLeft } from "lucide-react";
 
-export default async function FollowingPage({ params }: { params: Promise<{ id: string }> }) {
+type Props = {
+  params: Promise<{ id: string }>;
+  searchParams: Promise<{ page?: string }>;
+};
+
+const ITEMS_PER_PAGE = 20;
+
+export default async function FollowingPage({ params, searchParams }: Props) {
   const session = await auth();
   if (!session?.user?.id) {
     redirect("/login");
   }
 
   const { id } = await params;
+  const sp = await searchParams;
+  const page = Math.max(1, parseInt(sp.page || "1", 10));
 
   const user = await prisma.user.findUnique({
     where: { id },
@@ -22,15 +32,24 @@ export default async function FollowingPage({ params }: { params: Promise<{ id: 
     notFound();
   }
 
-  const follows = await prisma.follow.findMany({
-    where: { followerId: id },
-    include: {
-      following: {
-        select: { id: true, name: true, image: true, bio: true },
+  const where = { followerId: id };
+
+  const [follows, totalCount] = await Promise.all([
+    prisma.follow.findMany({
+      where,
+      include: {
+        following: {
+          select: { id: true, name: true, image: true, bio: true },
+        },
       },
-    },
-    orderBy: { createdAt: "desc" },
-  });
+      orderBy: { createdAt: "desc" },
+      skip: (page - 1) * ITEMS_PER_PAGE,
+      take: ITEMS_PER_PAGE,
+    }),
+    prisma.follow.count({ where }),
+  ]);
+
+  const totalPages = Math.ceil(totalCount / ITEMS_PER_PAGE);
 
   return (
     <div className="container max-w-2xl pb-8">
@@ -43,7 +62,10 @@ export default async function FollowingPage({ params }: { params: Promise<{ id: 
       </Link>
       <Card>
         <CardHeader>
-          <CardTitle>{user.name || "名前未設定"} のフォロー中</CardTitle>
+          <CardTitle>
+            {user.name || "名前未設定"} のフォロー中
+            <span className="ml-2 text-sm font-normal text-muted-foreground">（{totalCount}人）</span>
+          </CardTitle>
         </CardHeader>
         <CardContent>
           {follows.length === 0 ? (
@@ -61,6 +83,8 @@ export default async function FollowingPage({ params }: { params: Promise<{ id: 
           )}
         </CardContent>
       </Card>
+
+      <Pagination currentPage={page} totalPages={totalPages} basePath={`/users/${id}/following`} />
     </div>
   );
 }

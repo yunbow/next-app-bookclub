@@ -66,7 +66,7 @@ export function GoalForm({ onSuccess }: GoalFormProps) {
             <Label htmlFor="type">目標タイプ</Label>
             <Select
               value={goalType}
-              onValueChange={(value) => setValue("type", value as any)}
+              onValueChange={(value) => setValue("type", value as "yearly_books" | "monthly_books" | "genre_books" | "pages")}
             >
               <SelectTrigger>
                 <SelectValue />

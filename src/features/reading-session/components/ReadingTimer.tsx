@@ -32,6 +32,7 @@ export function ReadingTimer({ bookId, onSessionEnd }: ReadingTimerProps) {
 
       return () => clearInterval(interval);
     } else {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setElapsedTime(0);
     }
   }, [activeSession, bookId]);

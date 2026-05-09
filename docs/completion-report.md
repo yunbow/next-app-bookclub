@@ -6,13 +6,13 @@
 
 ## テストカバレッジ
 
-最終計測日: NOT_YET_MEASURED
+最終計測日: 2026-05-09
 
 | 指標 | カバレッジ | 備考 |
 |---|---|---|
-| Line | NOT_YET_MEASURED | vitest --coverage の `lines.pct` |
-| Branch | NOT_YET_MEASURED | vitest --coverage の `branches.pct` |
-| Function | NOT_YET_MEASURED | vitest --coverage の `functions.pct` |
+| Line | 62.94% | vitest --coverage の `lines.pct` |
+| Branch | 42.77% | vitest --coverage の `branches.pct` |
+| Function | 65.38% | vitest --coverage の `functions.pct` |
 
 **再計測コマンド**: プロジェクトルートで
 ```
@@ -21,6 +21,22 @@ node scripts/update-coverage-report.mjs next-app-bookclub
 を実行する。上のテーブルと最終計測日が自動更新される。初回は
 `npm install --save-dev @vitest/coverage-v8` で coverage プロバイダを入れること
 （未インストール時は NOT_YET_MEASURED のまま据え置き、guard は shape のみ検証する）。
+
+### ファイル別内訳（2026-05-09 時点）
+
+| ファイル | Statements | Branches | Functions | Lines |
+|---|---|---|---|---|
+| features/book/server/book-actions.ts | 90.62% | 66.66% | 100% | 96.55% |
+| features/event/schema/event-schema.ts | 100% | 50% | 100% | 100% |
+| features/event/server/event-actions.ts | 44.30% | 38.88% | 50% | 47.94% |
+| features/reading-goal/schema/goal-schema.ts | 100% | 75% | 100% | 100% |
+| features/review/server/review-actions.ts | 53.01% | 36.36% | 60% | 53.84% |
+| lib/logger.ts | 28.57% | 40% | 16.66% | 28.57% |
+| lib/subscription.ts | 71.42% | 25% | 50% | 71.42% |
+| lib/action-helpers.ts | 39.28% | 37.5% | 50% | 39.28% |
+| lib/env.ts | 84.61% | 53.84% | 100% | 84.61% |
+
+テストスイート: 7 ファイル / 61 テスト全パス
 
 ## Canonical guard の通過状況
 

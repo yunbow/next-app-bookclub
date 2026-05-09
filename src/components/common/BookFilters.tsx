@@ -4,7 +4,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Search, Filter, ArrowUpDown } from "lucide-react";
-import { useState, useEffect } from "react";
+import { useState, useRef } from "react";
 
 type Props = {
   basePath: string;
@@ -14,11 +14,13 @@ type Props = {
 export function BookFilters({ basePath, showStatusFilter = false }: Props) {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const [search, setSearch] = useState(searchParams.get("q") || "");
-
-  useEffect(() => {
-    setSearch(searchParams.get("q") || "");
-  }, [searchParams]);
+  const searchFromUrl = searchParams.get("q") || "";
+  const [search, setSearch] = useState(searchFromUrl);
+  const prevUrlSearch = useRef(searchFromUrl);
+  if (prevUrlSearch.current !== searchFromUrl) {
+    prevUrlSearch.current = searchFromUrl;
+    setSearch(searchFromUrl);
+  }
 
   const updateFilters = (key: string, value: string) => {
     const params = new URLSearchParams(searchParams.toString());

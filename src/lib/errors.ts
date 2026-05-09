@@ -99,7 +99,7 @@ export function errorToActionResult<T = void>(
   if (error instanceof Error) {
     // Check for Prisma errors
     if ('code' in error) {
-      const prismaCode = (error as any).code;
+      const prismaCode = (error as { code?: string }).code;
       
       // P2002: Unique constraint violation
       if (prismaCode === 'P2002') {

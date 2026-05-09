@@ -36,7 +36,8 @@ export function GoalsList() {
 
         {goals && goals.length > 0 ? (
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-            {goals.map((goal: any) => (
+            {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+            {(goals as any[]).map((goal) => (
               <GoalCard key={goal.id} goal={goal} />
             ))}
           </div>

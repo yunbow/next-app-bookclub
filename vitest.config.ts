@@ -8,6 +8,7 @@ export default defineConfig({
     environment: "jsdom",
     setupFiles: ["./src/tests/setup.ts"],
     globals: true,
+    // @ts-expect-error environmentMatchGlobs is valid at runtime but missing from vitest 4.x types
     environmentMatchGlobs: [
       ["**/*-actions.test.ts", "node"],
       ["**/*.integration.test.ts", "node"],

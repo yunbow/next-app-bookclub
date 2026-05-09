@@ -47,7 +47,7 @@ export function HighlightCard({ highlight, showActions = true }: HighlightCardPr
         <div className="space-y-3">
           <div className="flex items-start justify-between gap-2">
             <blockquote className="text-sm italic flex-1">
-              "{highlight.content}"
+              &ldquo;{highlight.content}&rdquo;
             </blockquote>
             {showActions && (
               <Button

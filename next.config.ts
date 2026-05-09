@@ -1,4 +1,5 @@
 import type { NextConfig } from "next";
+import bundleAnalyzer from "@next/bundle-analyzer";
 
 /** R2_PUBLIC_URL または R2_ENDPOINT から Next.js remotePattern を生成する */
 function buildR2RemotePatterns(): { protocol: "http" | "https"; hostname: string; port?: string }[] {
@@ -64,8 +65,6 @@ const nextConfig: NextConfig = {
   },
 };
 
-const withBundleAnalyzer = require("@next/bundle-analyzer")({
-  enabled: process.env.ANALYZE === "true",
-});
+const withBundleAnalyzer = bundleAnalyzer({ enabled: process.env.ANALYZE === "true" });
 
 export default withBundleAnalyzer(nextConfig);
