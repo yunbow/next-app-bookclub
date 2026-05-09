@@ -216,4 +216,15 @@ export async function seedDev(prisma: PrismaClient): Promise<void> {
       currentPage: 120,
     },
   });
+
+  // alice は Premium プラン
+  await prisma.subscription.upsert({
+    where: { userId: alice.id },
+    update: { plan: "premium", status: "active" },
+    create: {
+      userId: alice.id,
+      plan: "premium",
+      status: "active",
+    },
+  });
 }
