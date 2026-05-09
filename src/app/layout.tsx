@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono, Noto_Sans_JP } from "next/font/google";
+import { headers } from "next/headers";
 import "./globals.css";
 import { Providers } from "@/components/common/Providers";
 import { AppShell } from "@/components/common/AppShell";
@@ -70,13 +71,14 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   const locale = await getServerLocale();
+  const nonce = (await headers()).get("x-nonce") ?? undefined;
 
   return (
     <html lang={locale} suppressHydrationWarning>
       <body
         className={`${geistSans.variable} ${geistMono.variable} ${notoSansJp.variable} antialiased`}
       >
-        <Providers>
+        <Providers nonce={nonce}>
           <AppShell>{children}</AppShell>
           <Toaster />
           <CookieConsent />

@@ -10,13 +10,14 @@ import { ReactQueryProvider } from "@/lib/react-query/provider";
 
 type ProvidersProps = {
   children: React.ReactNode;
+  nonce?: string;
 };
 
-export function Providers({ children }: ProvidersProps) {
+export function Providers({ children, nonce }: ProvidersProps) {
   return (
     <SessionProvider>
       <ReactQueryProvider>
-        <ThemeProvider attribute="class" defaultTheme="system" enableSystem storageKey="theme">
+        <ThemeProvider attribute="class" defaultTheme="system" enableSystem storageKey="theme" nonce={nonce}>
           <FontSizeProvider>
             <ColorVisionProvider>
               <LocaleProvider>
